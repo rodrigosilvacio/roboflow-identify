@@ -30,11 +30,16 @@ Teste local:
 python -m http.server 8000 -d web
 ```
 
-## 2. (Opcional) Ligar o Roboflow via Supabase
+## 2. Roboflow via Supabase
+
+Publicado no projeto **ClaudeProjects** (`xtrvojnauvkkterogrst`, sa-east-1):
+`https://xtrvojnauvkkterogrst.supabase.co/functions/v1/identify-color`
+
+Para refazer o deploy:
 
 ```bash
 supabase link --project-ref <project-ref>
-supabase secrets set ROBOFLOW_API_KEY=<sua-chave> ALLOWED_ORIGIN=https://rodrigosilvacio.github.io
+supabase secrets set ROBOFLOW_API_KEY=<sua-chave>   # ALLOWED_ORIGIN opcional
 supabase functions deploy identify-color
 ```
 

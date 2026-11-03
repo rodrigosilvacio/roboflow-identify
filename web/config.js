@@ -1,8 +1,7 @@
 // Configuração pública do front (sem segredos).
+// A anon key do Supabase é pública por design; a chave do Roboflow fica só no servidor.
 // Deixe ROBOFLOW_PROXY_URL vazio para usar apenas a análise local no navegador.
-// Depois do deploy da Edge Function, preencha com:
-//   https://<project-ref>.supabase.co/functions/v1/identify-color
 window.APP_CONFIG = {
-  ROBOFLOW_PROXY_URL: "",
-  SUPABASE_ANON_KEY: "", // chave anon/publishable do Supabase (segura para o browser)
+  ROBOFLOW_PROXY_URL: "https://xtrvojnauvkkterogrst.supabase.co/functions/v1/identify-color",
+  SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh0cnZvam5hdXZra3Rlcm9ncnN0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMyMDM0MzIsImV4cCI6MjA5ODc3OTQzMn0.FpsKiux4AA7id9CVgVQNysQCGGQspoTJYEL_EJ5ddmg",
 };

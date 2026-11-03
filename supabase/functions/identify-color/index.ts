@@ -2,13 +2,13 @@
 // A ROBOFLOW_API_KEY fica como secret no Supabase, nunca no front.
 //
 // Deploy:
-//   supabase secrets set ROBOFLOW_API_KEY=... ALLOWED_ORIGIN=https://rodrigosilvacio.github.io
+//   supabase secrets set ROBOFLOW_API_KEY=...   (ALLOWED_ORIGIN opcional, padrão: GitHub Pages)
 //   supabase functions deploy identify-color
 
 const API_KEY = Deno.env.get("ROBOFLOW_API_KEY") ?? "";
 const WORKSPACE = Deno.env.get("ROBOFLOW_WORKSPACE") ?? "rodrigos-workspace-1ibon";
 const WORKFLOW_ID = Deno.env.get("ROBOFLOW_WORKFLOW_ID") ?? "identificador-de-cores-mvp";
-const ALLOWED_ORIGIN = Deno.env.get("ALLOWED_ORIGIN") ?? "*";
+const ALLOWED_ORIGIN = Deno.env.get("ALLOWED_ORIGIN") ?? "https://rodrigosilvacio.github.io";
 const MAX_BASE64_CHARS = 11_000_000; // ~8 MB de imagem
 
 const cors = {
