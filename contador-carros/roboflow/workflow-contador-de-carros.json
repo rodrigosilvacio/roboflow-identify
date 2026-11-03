@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "inputs": [
+    { "type": "WorkflowImage", "name": "image" },
+    { "type": "WorkflowParameter", "name": "confidence", "default_value": 0.4 },
+    { "type": "WorkflowParameter", "name": "classes", "default_value": ["car"] }
+  ],
+  "steps": [
+    {
+      "type": "roboflow_core/roboflow_object_detection_model@v2",
+      "name": "detector",
+      "image": "$inputs.image",
+      "model_id": "rfdetr-nano",
+      "confidence": "$inputs.confidence",
+      "class_filter": "$inputs.classes"
+    },
+    {
+      "type": "roboflow_core/property_definition@v1",
+      "name": "count",
+      "data": "$steps.detector.predictions",
+      "operations": [{ "type": "SequenceLength" }]
+    }
+  ],
+  "outputs": [
+    { "type": "JsonField", "name": "count", "selector": "$steps.count.output" },
+    { "type": "JsonField", "name": "predictions", "selector": "$steps.detector.predictions" }
+  ]
+}

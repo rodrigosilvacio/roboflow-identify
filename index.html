@@ -3,13 +3,40 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Identificador de Cores</title>
-  <meta http-equiv="refresh" content="0; url=web/" />
-  <link rel="canonical" href="web/" />
-  <style>body{margin:0;background:#0e1116;color:#e6edf3;font:16px system-ui,sans-serif;display:grid;place-items:center;min-height:100vh}a{color:#7c5cff}</style>
+  <title>Projetos Roboflow</title>
+  <meta name="description" content="Projetos de visão computacional com Roboflow: identificador de cores e contador de carros." />
+  <style>
+    :root { --bg:#0e1116; --surface:#161b22; --border:#2a313c; --text:#e6edf3; --muted:#8b949e; --accent:#7c5cff; color-scheme:dark; }
+    @media (prefers-color-scheme: light) { :root { --bg:#f6f8fa; --surface:#fff; --border:#d0d7de; --text:#1f2328; --muted:#57606a; color-scheme:light; } }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--text); font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; }
+    main { max-width:880px; margin:0 auto; padding:48px 16px; }
+    h1 { margin:0 0 4px; font-size:1.9rem; letter-spacing:-0.02em; }
+    .lead { margin:0 0 28px; color:var(--muted); }
+    .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+    a.card { display:block; padding:22px; background:var(--surface); border:1px solid var(--border); border-radius:14px; color:inherit; text-decoration:none; transition:border-color .15s, transform .15s; }
+    a.card:hover, a.card:focus-visible { border-color:var(--accent); transform:translateY(-2px); outline:none; }
+    .card h2 { margin:0 0 6px; font-size:1.2rem; }
+    .card p { margin:0; color:var(--muted); font-size:.95rem; }
+    .tag { display:inline-block; margin-top:14px; font-size:.8rem; color:var(--accent); }
+  </style>
 </head>
 <body>
-  <p>Abrindo o Identificador de Cores... <a href="web/">clique aqui</a> se não abrir.</p>
-  <script>location.replace("web/");</script>
+  <main>
+    <h1>Projetos Roboflow</h1>
+    <p class="lead">Visão computacional aplicada: envie uma imagem e veja o resultado.</p>
+    <div class="cards">
+      <a class="card" href="web/">
+        <h2>Identificador de Cores</h2>
+        <p>Descubra a cor dominante, a paleta e o nome de cada cor de uma imagem.</p>
+        <span class="tag">Navegador + Roboflow (Dominant Color)</span>
+      </a>
+      <a class="card" href="contador-carros/">
+        <h2>Contador de Carros</h2>
+        <p>Envie uma foto de rua ou estacionamento e veja quantos carros existem nela.</p>
+        <span class="tag">Roboflow (RF-DETR)</span>
+      </a>
+    </div>
+  </main>
 </body>
 </html>

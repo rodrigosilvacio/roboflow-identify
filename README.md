@@ -1,5 +1,16 @@
 # roboflow-identify
 
+Projetos de visão computacional com Roboflow, publicados no GitHub Pages:
+
+| Projeto | Pasta | Link |
+|---|---|---|
+| Identificador de Cores | `web/` | https://rodrigosilvacio.github.io/roboflow-identify/web/ |
+| Contador de Carros | `contador-carros/` | https://rodrigosilvacio.github.io/roboflow-identify/contador-carros/ |
+
+---
+
+## Identificador de Cores
+
 Identificador de cores: envie uma imagem e receba a cor dominante (nome, HEX, RGB) e a paleta.
 
 **Acesse:** https://rodrigosilvacio.github.io/roboflow-identify/
