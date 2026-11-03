@@ -12,7 +12,7 @@
   const SENS_LABEL = { 1: "Muito baixa", 2: "Baixa", 3: "Média", 4: "Alta", 5: "Muito alta" };
   const AI_COOLDOWN_MS = 2500;             // no máximo 1 consulta à IA a cada 2,5 s
   const ALERT_COOLDOWN_MS = 10000;         // não repete o alerta por 10 s
-  const SEND_W = 640;                      // largura do quadro enviado ao Roboflow
+  const SEND_W = 960;                      // largura do quadro enviado (maior ajuda a achar celulares)
 
   const sample = document.createElement("canvas");
   sample.width = SAMPLE_W; sample.height = SAMPLE_H;
@@ -20,7 +20,8 @@
   const sendCanvas = document.createElement("canvas");
 
   let stream = null, prev = null, timer = null, wakeLock = null;
-  let lastAI = 0, lastAlert = 0, inFlight = false, calls = 0, alerts = 0, boxesUntil = 0;
+  let lastAI = 0, inFlight = false, calls = 0, alerts = 0, phoneAlerts = 0, boxesUntil = 0;
+  const lastAlert = { person: 0, phone: 0 }; // anti-repetição separada por tipo
 
   const setStatus = (msg, kind = "") => { $("#status").textContent = msg; $("#status").dataset.kind = kind; };
   const setState = (s, kind = "") => { $("#state").textContent = s; $("#state").dataset.kind = kind; };
@@ -61,14 +62,15 @@
       const resp = await fetch(cfg.PROXY_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${cfg.SUPABASE_ANON_KEY}`, apikey: cfg.SUPABASE_ANON_KEY },
-        body: JSON.stringify({ image: dataUrl.split(",")[1], confidence: 0.5 }),
+        body: JSON.stringify({ image: dataUrl.split(",")[1], confidence: 0.5, phone_confidence: 0.3 }),
       });
       const data = await resp.json().catch(() => ({}));
       if (!resp.ok) throw new Error(data.error || `Erro ${resp.status}`);
       $("#calls-count").textContent = ++calls;
-      if (data.count > 0) {
-        drawBoxes(data.people, data.image?.width || SEND_W);
-        triggerAlert(data.count, dataUrl);
+      const phones = $("#phone").checked ? data.phones || [] : [];
+      if (data.count > 0 || phones.length > 0) {
+        drawBoxes(data.people || [], phones, data.image?.width || SEND_W);
+        triggerAlert(data.count, phones.length, dataUrl);
       } else {
         setState("Monitorando", "ok");
         setStatus("Movimento detectado, mas não era uma pessoa. Alerta ignorado.");
@@ -81,49 +83,71 @@
     }
   }
 
-  function drawBoxes(people, srcW) {
+  function drawBoxes(people, phones, srcW) {
     overlay.width = video.clientWidth; overlay.height = video.clientHeight;
     const k = overlay.width / srcW;
     octx.clearRect(0, 0, overlay.width, overlay.height);
-    octx.strokeStyle = "#f85149"; octx.lineWidth = 3;
-    people.forEach((p) => octx.strokeRect((p.x - p.width / 2) * k, (p.y - p.height / 2) * k, p.width * k, p.height * k));
+    const box = (p, color, label) => {
+      const x = (p.x - p.width / 2) * k, y = (p.y - p.height / 2) * k;
+      octx.strokeStyle = color; octx.lineWidth = 3;
+      octx.strokeRect(x, y, p.width * k, p.height * k);
+      octx.font = "600 13px system-ui, sans-serif";
+      const w = octx.measureText(label).width + 10;
+      octx.fillStyle = color; octx.fillRect(x, Math.max(0, y - 20), w, 20);
+      octx.fillStyle = "#fff"; octx.fillText(label, x + 5, Math.max(14, y - 6));
+    };
+    people.forEach((p) => box(p, "#f85149", "Pessoa"));
+    phones.forEach((p) => box(p, "#ff8c00", "Celular"));
     boxesUntil = Date.now() + 3000;
   }
 
-  function beep() {
+  // Pessoa: 3 bipes graves. Pessoa com celular: 5 bipes agudos e rápidos.
+  function beep(type) {
     try {
       const ac = new (window.AudioContext || window.webkitAudioContext)();
-      [0, 0.25, 0.5].forEach((t) => {
+      const times = type === "phone" ? [0, 0.15, 0.3, 0.45, 0.6] : [0, 0.25, 0.5];
+      times.forEach((t) => {
         const o = ac.createOscillator(), g = ac.createGain();
-        o.frequency.value = 880; o.connect(g); g.connect(ac.destination);
+        o.frequency.value = type === "phone" ? 1320 : 880; o.connect(g); g.connect(ac.destination);
         g.gain.setValueAtTime(0.25, ac.currentTime + t);
-        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + t + 0.2);
-        o.start(ac.currentTime + t); o.stop(ac.currentTime + t + 0.2);
+        g.gain.exponentialRampToValueAtTime(0.001, ac.currentTime + t + 0.12);
+        o.start(ac.currentTime + t); o.stop(ac.currentTime + t + 0.12);
       });
     } catch { /* sem áudio */ }
   }
 
-  function triggerAlert(count, dataUrl) {
-    const now = new Date();
-    const time = now.toLocaleTimeString("pt-BR");
-    const text = `${count} ${count === 1 ? "pessoa" : "pessoas"} às ${time}`;
-    setState("Pessoa detectada", "alert");
+  function triggerAlert(count, phoneCount, dataUrl) {
+    const type = phoneCount > 0 ? "phone" : "person";
+    const time = new Date().toLocaleTimeString("pt-BR");
+    const who = count > 0 ? `${count} ${count === 1 ? "pessoa" : "pessoas"}` : "Mão ou objeto";
+    const text = type === "phone"
+      ? `${who} com ${phoneCount === 1 ? "celular visível" : `${phoneCount} celulares visíveis`} às ${time}`
+      : `${who} às ${time}`;
+    const title = type === "phone" ? "📱 Pessoa com celular" : "🚨 Pessoa detectada";
+    setState(type === "phone" ? "Com celular" : "Pessoa detectada", "alert");
     setStatus(`Alerta: ${text}.`, "error");
-    if (Date.now() - lastAlert < ALERT_COOLDOWN_MS) return; // evita alertas repetidos em sequência
-    lastAlert = Date.now();
+    // Anti-repetição por tipo: um celular que aparece depois ainda gera alerta
+    if (Date.now() - lastAlert[type] < ALERT_COOLDOWN_MS) return;
+    lastAlert[type] = Date.now();
+    if (type === "phone") lastAlert.person = Date.now();
     $("#alerts-count").textContent = ++alerts;
+    if (type === "phone") $("#phones-count").textContent = ++phoneAlerts;
+    $("#alert-title").textContent = title;
     $("#alert-text").textContent = text;
+    $("#alert").dataset.type = type;
     $("#alert").hidden = false;
     clearTimeout(triggerAlert.t);
     triggerAlert.t = setTimeout(() => ($("#alert").hidden = true), 6000);
-    if ($("#sound").checked) beep();
+    if ($("#sound").checked) beep(type);
     if ($("#notify").checked && "Notification" in window && Notification.permission === "granted") {
-      new Notification("Pessoa detectada", { body: text });
+      new Notification(type === "phone" ? "Pessoa com celular" : "Pessoa detectada", { body: text });
     }
     const log = $("#log");
     log.querySelector(".empty")?.remove();
     const li = document.createElement("li");
-    li.innerHTML = `<img alt="Quadro do alerta" src="${dataUrl}"><div><b>${time}</b><span>${count} ${count === 1 ? "pessoa" : "pessoas"}</span></div>`;
+    li.dataset.type = type;
+    const label = type === "phone" ? "📱 Com celular" : "🚶 Pessoa";
+    li.innerHTML = `<img alt="Quadro do alerta" src="${dataUrl}"><div><b>${time}</b><span>${label} · ${who}</span></div>`;
     log.prepend(li);
     while (log.children.length > 10) log.lastChild.remove();
   }
@@ -137,7 +161,7 @@
     $("#meter-bar").dataset.active = moving;
     if (moving && !inFlight && Date.now() - lastAI > AI_COOLDOWN_MS) askAI();
     else if (!inFlight && $("#state").dataset.kind !== "alert") setState(moving ? "Movimento" : "Monitorando", "ok");
-    if ($("#state").dataset.kind === "alert" && Date.now() - lastAlert > 4000 && !moving) setState("Monitorando", "ok");
+    if ($("#state").dataset.kind === "alert" && Date.now() - Math.max(lastAlert.person, lastAlert.phone) > 4000 && !moving) setState("Monitorando", "ok");
   }
 
   async function start() {

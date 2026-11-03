@@ -11,11 +11,11 @@
   <main>
     <header>
       <h1>Detector de Movimento</h1>
-      <p>Deixe esta página aberta com a câmera ligada. Quando uma <strong>pessoa</strong> passar, você recebe um alerta.</p>
+      <p>Deixe esta página aberta com a câmera ligada. Você recebe um alerta quando uma <strong>pessoa</strong> passar e um alerta diferente quando ela estiver <strong>com celular</strong> visível.</p>
     </header>
 
     <div id="alert" class="alert" hidden role="alert">
-      <strong>🚨 Pessoa detectada</strong>
+      <strong id="alert-title">🚨 Pessoa detectada</strong>
       <span id="alert-text"></span>
     </div>
 
@@ -41,6 +41,7 @@
         <div class="stats">
           <div><span class="label">Estado</span><b id="state">Parado</b></div>
           <div><span class="label">Alertas</span><b id="alerts-count">0</b></div>
+          <div><span class="label">Com celular</span><b id="phones-count">0</b></div>
           <div><span class="label">Consultas à IA</span><b id="calls-count">0</b></div>
         </div>
 
@@ -48,6 +49,7 @@
         <label>Sensibilidade ao movimento <output id="sens-out">Média</output>
           <input id="sens" type="range" min="1" max="5" step="1" value="3" />
         </label>
+        <label class="check"><input id="phone" type="checkbox" checked /> Detectar celular</label>
         <label class="check"><input id="sound" type="checkbox" checked /> Alerta sonoro</label>
         <label class="check"><input id="notify" type="checkbox" /> Notificação do sistema</label>
         <button id="stop" type="button" hidden>Parar monitoramento</button>
@@ -58,7 +60,7 @@
     </section>
 
     <footer>
-      <p><strong>Privacidade:</strong> o vídeo fica no seu navegador. Só quando há movimento um quadro é enviado ao Roboflow para confirmar se é uma pessoa, e ele não é armazenado. As miniaturas dos alertas ficam apenas nesta aba e somem ao fechá-la. Avise as pessoas do ambiente que há uma câmera ligada.</p>
+      <p><strong>Privacidade:</strong> o vídeo fica no seu navegador. Só quando há movimento um quadro é enviado ao Roboflow para verificar se é uma pessoa e se há celular visível, e ele não é armazenado. Celular no bolso ou na bolsa não é detectado. As miniaturas dos alertas ficam apenas nesta aba e somem ao fechá-la. Avise as pessoas do ambiente que há uma câmera ligada.</p>
       <p><a href="../">Outros projetos</a> · <a href="https://github.com/rodrigosilvacio/roboflow-identify/tree/main/detector-movimento">Código</a></p>
     </footer>
   </main>
