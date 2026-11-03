@@ -2,6 +2,8 @@
 
 Identificador de cores: envie uma imagem e receba a cor dominante (nome, HEX, RGB) e a paleta.
 
+**Acesse:** https://rodrigosilvacio.github.io/roboflow-identify/
+
 ## Arquitetura
 
 ```
