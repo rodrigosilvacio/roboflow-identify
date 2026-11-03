@@ -33,8 +33,12 @@ O `my-first-project-mz66k — Base Workflow` é gerenciado pela plataforma e nã
 
 ## 1. Publicar no GitHub Pages
 
-O Pages publica a raiz da branch `main` (*Settings > Pages > Deploy from a branch: main / root*).
-O `index.html` da raiz redireciona para a interface em `web/`. Todo push na `main` atualiza o site.
+Deploy via GitHub Actions (`.github/workflows/pages.yml`) a cada push na `main`.
+O workflow publica apenas os arquivos do site (`index.html`, `web/`, `contador-carros/`), sem código de backend.
+
+Configuração única no repositório:
+- *Settings > Pages > Source:* **GitHub Actions**
+- *Settings > Environments > github-pages > Deployment branches:* permitir `main`
 
 Teste local:
 
