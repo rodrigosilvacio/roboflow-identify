@@ -22,9 +22,8 @@ O `my-first-project-mz66k — Base Workflow` é gerenciado pela plataforma e nã
 
 ## 1. Publicar no GitHub Pages
 
-1. Em *Settings > Pages*, escolha **Source: GitHub Actions**.
-2. Faça merge para `main`. O workflow `.github/workflows/pages.yml` publica a pasta `web/`.
-3. URL: `https://rodrigosilvacio.github.io/roboflow-identify/`
+O Pages publica a raiz da branch `main` (*Settings > Pages > Deploy from a branch: main / root*).
+O `index.html` da raiz redireciona para a interface em `web/`. Todo push na `main` atualiza o site.
 
 Teste local:
 
