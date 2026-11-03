@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Detector de Movimento</title>
+  <meta name="description" content="Deixe a câmera ligada: o sistema avisa quando uma pessoa passar." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Detector de Movimento</h1>
+      <p>Deixe esta página aberta com a câmera ligada. Quando uma <strong>pessoa</strong> passar, você recebe um alerta.</p>
+    </header>
+
+    <div id="alert" class="alert" hidden role="alert">
+      <strong>🚨 Pessoa detectada</strong>
+      <span id="alert-text"></span>
+    </div>
+
+    <section class="grid">
+      <div class="stage">
+        <div class="video-wrap">
+          <video id="video" playsinline muted></video>
+          <canvas id="overlay"></canvas>
+          <div id="placeholder" class="placeholder">
+            <p>A câmera está desligada.</p>
+            <button id="start" type="button" class="primary">Ligar câmera e monitorar</button>
+          </div>
+          <span id="live" class="live" hidden>● AO VIVO</span>
+        </div>
+        <div class="meter" aria-label="Nível de movimento">
+          <div id="meter-bar" class="meter-bar"></div>
+          <div id="meter-threshold" class="meter-threshold"></div>
+        </div>
+        <p id="status" role="status" aria-live="polite">Clique em "Ligar câmera" para começar.</p>
+      </div>
+
+      <aside class="panel">
+        <div class="stats">
+          <div><span class="label">Estado</span><b id="state">Parado</b></div>
+          <div><span class="label">Alertas</span><b id="alerts-count">0</b></div>
+          <div><span class="label">Consultas à IA</span><b id="calls-count">0</b></div>
+        </div>
+
+        <h2>Ajustes</h2>
+        <label>Sensibilidade ao movimento <output id="sens-out">Média</output>
+          <input id="sens" type="range" min="1" max="5" step="1" value="3" />
+        </label>
+        <label class="check"><input id="sound" type="checkbox" checked /> Alerta sonoro</label>
+        <label class="check"><input id="notify" type="checkbox" /> Notificação do sistema</label>
+        <button id="stop" type="button" hidden>Parar monitoramento</button>
+
+        <h2>Últimos alertas</h2>
+        <ol id="log" class="log"><li class="empty">Nenhum alerta ainda.</li></ol>
+      </aside>
+    </section>
+
+    <footer>
+      <p><strong>Privacidade:</strong> o vídeo fica no seu navegador. Só quando há movimento um quadro é enviado ao Roboflow para confirmar se é uma pessoa, e ele não é armazenado. As miniaturas dos alertas ficam apenas nesta aba e somem ao fechá-la. Avise as pessoas do ambiente que há uma câmera ligada.</p>
+      <p><a href="../">Outros projetos</a> · <a href="https://github.com/rodrigosilvacio/roboflow-identify/tree/main/detector-movimento">Código</a></p>
+    </footer>
+  </main>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -6,6 +6,7 @@ Projetos de visão computacional com Roboflow, publicados no GitHub Pages:
 |---|---|---|
 | Identificador de Cores | `web/` | https://rodrigosilvacio.github.io/roboflow-identify/web/ |
 | Contador de Carros | `contador-carros/` | https://rodrigosilvacio.github.io/roboflow-identify/contador-carros/ |
+| Detector de Movimento | `detector-movimento/` | https://rodrigosilvacio.github.io/roboflow-identify/detector-movimento/ |
 
 ---
 
