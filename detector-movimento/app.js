@@ -11,6 +11,7 @@
   const SENS = { 1: 0.12, 2: 0.07, 3: 0.04, 4: 0.02, 5: 0.01 }; // % da imagem que precisa mudar
   const SENS_LABEL = { 1: "Muito baixa", 2: "Baixa", 3: "Média", 4: "Alta", 5: "Muito alta" };
   const AI_COOLDOWN_MS = 2500;             // no máximo 1 consulta à IA a cada 2,5 s
+  const PRESENCE_MS = 20000;               // com pessoa na cena, segue consultando por 20 s mesmo sem movimento
   const ALERT_COOLDOWN_MS = 10000;         // não repete o alerta por 10 s
   const SEND_W = 960;                      // largura do quadro enviado (maior ajuda a achar celulares)
 
@@ -22,10 +23,24 @@
   let stream = null, prev = null, timer = null, wakeLock = null;
   let lastAI = 0, inFlight = false, calls = 0, alerts = 0, phoneAlerts = 0, boxesUntil = 0;
   const lastAlert = { person: 0, phone: 0 }; // anti-repetição separada por tipo
+  let lastPersonSeen = 0;
 
   const setStatus = (msg, kind = "") => { $("#status").textContent = msg; $("#status").dataset.kind = kind; };
   const setState = (s, kind = "") => { $("#state").textContent = s; $("#state").dataset.kind = kind; };
   const threshold = () => SENS[$("#sens").value];
+  const phoneMin = () => Number($("#phone-sens").value) / 100;
+  const pct = (v) => `${Math.round((v || 0) * 100)}%`;
+
+  // Diagnóstico: mostra o que o modelo viu, inclusive celular abaixo do limite
+  function showDiag(d) {
+    const people = d.count ? `${d.count} ${d.count === 1 ? "pessoa" : "pessoas"} (${pct(d.best_person_confidence)})` : "nenhuma pessoa";
+    const best = d.best_phone_confidence || 0;
+    const phone = best
+      ? `celular: maior confiança ${pct(best)} ${best >= phoneMin() ? "✅" : `(abaixo do limite de ${pct(phoneMin())})`}`
+      : "celular: nada parecido";
+    const secs = d.ms ? ` em ${(d.ms / 1000).toFixed(1).replace(".", ",")} s` : "";
+    $("#diag").textContent = `Última análise${secs}: ${people} · ${phone}`;
+  }
 
   function updateThresholdMarker() {
     $("#meter-threshold").style.left = `${Math.min(100, (threshold() / 0.15) * 100)}%`;
@@ -54,19 +69,22 @@
   }
 
   // 2) Só quando há movimento: pergunta ao Roboflow se é uma pessoa
-  async function askAI() {
+  async function askAI({ warmup = false } = {}) {
     inFlight = true; lastAI = Date.now();
-    setState("Verificando…", "busy");
+    if (!warmup) setState("Verificando…", "busy");
     const dataUrl = frameToBase64();
     try {
       const resp = await fetch(cfg.PROXY_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${cfg.SUPABASE_ANON_KEY}`, apikey: cfg.SUPABASE_ANON_KEY },
-        body: JSON.stringify({ image: dataUrl.split(",")[1], confidence: 0.5, phone_confidence: 0.3 }),
+        body: JSON.stringify({ image: dataUrl.split(",")[1], confidence: 0.5, phone_confidence: phoneMin() }),
       });
       const data = await resp.json().catch(() => ({}));
       if (!resp.ok) throw new Error(data.error || `Erro ${resp.status}`);
       $("#calls-count").textContent = ++calls;
+      showDiag(data);
+      if (data.count > 0) lastPersonSeen = Date.now();
+      if (warmup) { setState("Monitorando", "ok"); setStatus("Modelo pronto. Monitorando.", "ok"); return; }
       const phones = $("#phone").checked ? data.phones || [] : [];
       if (data.count > 0 || phones.length > 0) {
         drawBoxes(data.people || [], phones, data.image?.width || SEND_W);
@@ -159,7 +177,8 @@
     if (Date.now() > boxesUntil) octx.clearRect(0, 0, overlay.width, overlay.height);
     const moving = level >= threshold();
     $("#meter-bar").dataset.active = moving;
-    if (moving && !inFlight && Date.now() - lastAI > AI_COOLDOWN_MS) askAI();
+    const present = Date.now() - lastPersonSeen < PRESENCE_MS; // pessoa parada segurando o celular
+    if ((moving || present) && !inFlight && Date.now() - lastAI > AI_COOLDOWN_MS) askAI();
     else if (!inFlight && $("#state").dataset.kind !== "alert") setState(moving ? "Movimento" : "Monitorando", "ok");
     if ($("#state").dataset.kind === "alert" && Date.now() - Math.max(lastAlert.person, lastAlert.phone) > 4000 && !moving) setState("Monitorando", "ok");
   }
@@ -179,14 +198,19 @@
     $("#placeholder").hidden = true;
     $("#live").hidden = false;
     $("#stop").hidden = false;
+    $("#analyze").hidden = false;
     setState("Monitorando", "ok");
     setStatus("Monitorando. Mantenha esta aba aberta e visível.", "ok");
     timer = setInterval(tick, 200); // 5 verificações por segundo
+    // Aquecimento: a primeira chamada carrega o modelo no Roboflow e pode levar alguns segundos
+    setStatus("Preparando o modelo de IA (a primeira análise demora um pouco)...");
+    setTimeout(() => !inFlight && askAI({ warmup: true }), 600);
     try { wakeLock = await navigator.wakeLock?.request("screen"); } catch { /* opcional */ }
   }
 
   function stop() {
     clearInterval(timer);
+    lastPersonSeen = 0;
     stream?.getTracks().forEach((t) => t.stop());
     stream = null;
     wakeLock?.release?.(); wakeLock = null;
@@ -195,6 +219,7 @@
     $("#placeholder").hidden = false;
     $("#live").hidden = true;
     $("#stop").hidden = true;
+    $("#analyze").hidden = true;
     $("#meter-bar").style.width = "0";
     setState("Parado");
     setStatus("Monitoramento parado.");
@@ -203,6 +228,8 @@
   $("#start").addEventListener("click", start);
   $("#stop").addEventListener("click", stop);
   $("#sens").addEventListener("input", updateThresholdMarker);
+  $("#phone-sens").addEventListener("input", (e) => ($("#phone-sens-out").textContent = `${e.target.value}%`));
+  $("#analyze").addEventListener("click", () => { if (stream && !inFlight) askAI(); });
   $("#notify").addEventListener("change", async (e) => {
     if (e.target.checked && "Notification" in window && Notification.permission !== "granted") {
       const p = await Notification.requestPermission();

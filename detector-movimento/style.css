@@ -46,7 +46,9 @@ button:focus-visible, input:focus-visible { outline: 2px solid var(--accent); ou
 .panel label output { color: var(--muted); }
 .panel label.check { display: flex; align-items: center; gap: 8px; }
 input[type="range"] { accent-color: var(--accent); width: 100%; }
-#stop { width: 100%; margin-top: 4px; }
+#stop, #analyze { width: 100%; margin-top: 4px; }
+#analyze { border-color: var(--accent); color: var(--accent); }
+.diag { margin: 4px 0 0; color: var(--muted); font-size: .85rem; font-variant-numeric: tabular-nums; }
 .log { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; max-height: 360px; overflow-y: auto; }
 .log li { display: flex; gap: 10px; align-items: center; }
 .log img { width: 72px; height: 40px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
