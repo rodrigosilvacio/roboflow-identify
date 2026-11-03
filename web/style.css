@@ -36,4 +36,5 @@ button { background: var(--accent); color: #fff; border: 0; border-radius: 8px; 
 .palette li:hover { background: color-mix(in srgb, var(--accent) 12%, transparent); }
 .chip { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border); }
 .pct { color: var(--muted); font-size: .85rem; min-width: 48px; text-align: right; }
+footer a { color: var(--accent); }
 footer { margin-top: 32px; color: var(--muted); font-size: .85rem; }
