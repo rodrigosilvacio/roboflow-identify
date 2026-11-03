@@ -1,0 +1,10 @@
+{
+  "version": "1.0",
+  "inputs": [{ "type": "WorkflowImage", "name": "image" }],
+  "steps": [
+    { "type": "roboflow_core/dominant_color@v1", "name": "dominant_color", "image": "$inputs.image" }
+  ],
+  "outputs": [
+    { "type": "JsonField", "name": "rgb", "selector": "$steps.dominant_color.rgb_color" }
+  ]
+}

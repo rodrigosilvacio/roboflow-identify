@@ -13,8 +13,10 @@ from inference_sdk import InferenceHTTPClient
 load_dotenv()
 
 API_KEY = os.getenv("ROBOFLOW_API_KEY")
-WORKSPACE_NAME = "rodrigos-workspace-1ibon"
-WORKFLOW_ID = "my-first-project-mz66k"  # my-first-project-mz66k — Base Workflow
+WORKSPACE_NAME = os.getenv("ROBOFLOW_WORKSPACE", "rodrigos-workspace-1ibon")
+# O Base Workflow (my-first-project-mz66k) é vazio e protegido contra edição.
+# O identificador-de-cores-mvp contém o bloco Dominant Color.
+WORKFLOW_ID = os.getenv("ROBOFLOW_WORKFLOW_ID", "identificador-de-cores-mvp")
 
 
 def main() -> None:

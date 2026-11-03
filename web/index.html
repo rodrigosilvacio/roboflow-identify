@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Identificador de Cores</title>
+  <meta name="description" content="Envie uma imagem e descubra a cor dominante, com HEX, RGB e nome." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Identificador de Cores</h1>
+      <p>Envie uma imagem e descubra a cor dominante, a paleta e o nome de cada cor.</p>
+    </header>
+
+    <div id="drop" class="drop" tabindex="0" role="button" aria-label="Enviar imagem">
+      <strong>Arraste uma imagem aqui</strong>
+      <span>ou clique para escolher, ou cole com Ctrl+V</span>
+      <input id="file" type="file" accept="image/*" hidden />
+    </div>
+
+    <label id="roboflow-toggle" class="toggle" hidden>
+      <input id="use-roboflow" type="checkbox" checked /> Usar Roboflow Workflow
+    </label>
+
+    <p id="status" role="status" aria-live="polite"></p>
+
+    <section class="grid">
+      <canvas id="preview" hidden title="Clique para pegar a cor de um ponto"></canvas>
+
+      <div id="result" class="card" hidden>
+        <div id="swatch" class="swatch"></div>
+        <h2 id="color-name"></h2>
+        <p class="codes">
+          <code id="color-hex"></code>
+          <button id="copy-hex" type="button">Copiar</button>
+        </p>
+        <p><code id="color-rgb"></code></p>
+        <p class="source">Fonte: <span id="source"></span></p>
+
+        <h3>Paleta</h3>
+        <ul id="palette" class="palette"></ul>
+      </div>
+    </section>
+
+    <footer>
+      <p>Por padrão, a imagem é processada no seu navegador e não é enviada a nenhum servidor.</p>
+    </footer>
+  </main>
+  <script src="config.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
