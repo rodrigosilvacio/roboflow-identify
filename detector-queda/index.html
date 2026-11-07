@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Detector de Queda</title>
+  <meta name="description" content="Acompanha a pessoa pela câmera e soa um alarme em caso de queda ou movimento brusco." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Detector de Queda</h1>
+      <p>A câmera acompanha o esqueleto da pessoa em tempo real. Se ela <strong>cair e não levantar</strong>, soa um alarme. Movimentos bruscos geram um aviso.</p>
+    </header>
+
+    <div id="banner" class="banner" hidden role="alert">
+      <div><strong id="banner-title"></strong><span id="banner-text"></span></div>
+      <button id="ack" type="button" hidden>Estou bem · desligar alarme</button>
+    </div>
+
+    <section class="grid">
+      <div class="stage">
+        <div class="video-wrap">
+          <video id="video" playsinline muted></video>
+          <canvas id="overlay"></canvas>
+          <div id="placeholder" class="placeholder">
+            <p>A câmera está desligada.</p>
+            <button id="start" type="button" class="primary">Ligar câmera e acompanhar</button>
+            <small>O modelo de pose (cerca de 6 MB) é baixado na primeira vez.</small>
+          </div>
+          <span id="live" class="live" hidden>● AO VIVO</span>
+          <span id="phase-badge" class="badge" hidden></span>
+        </div>
+        <p id="status" role="status" aria-live="polite">Clique em "Ligar câmera" para começar.</p>
+      </div>
+
+      <aside class="panel">
+        <div class="stats">
+          <div><span class="label">Pessoa</span><b id="posture">—</b></div>
+          <div><span class="label">Inclinação do tronco</span><b id="angle">—</b></div>
+          <div><span class="label">Velocidade do tronco</span><b id="speed">—</b></div>
+          <div><span class="label">Quadros/s</span><b id="fps">—</b></div>
+        </div>
+
+        <h2>Ajustes</h2>
+        <label>Sensibilidade <output id="sens-out">Média</output>
+          <input id="sens" type="range" min="1" max="5" step="1" value="3" />
+        </label>
+        <label>Tempo no chão para soar o alarme <output id="confirm-out">4 s</output>
+          <input id="confirm" type="range" min="2" max="10" step="1" value="4" />
+        </label>
+        <label class="check"><input id="abrupt" type="checkbox" checked /> Avisar movimento brusco</label>
+        <label class="check"><input id="longlie" type="checkbox" /> Alarme se ficar deitado mais de 30 s</label>
+        <label class="check"><input id="sound" type="checkbox" checked /> Som</label>
+        <button id="test-alarm" type="button">Testar alarme</button>
+        <button id="stop" type="button" hidden>Parar</button>
+
+        <h2>Ocorrências</h2>
+        <ol id="log" class="log"><li class="empty">Nenhuma ocorrência ainda.</li></ol>
+      </aside>
+    </section>
+
+    <section class="how">
+      <h2>Como funciona</h2>
+      <ol>
+        <li><b>Esqueleto:</b> um modelo de pose marca ombros, quadril, joelhos e tornozelos cerca de 30 vezes por segundo, direto no navegador.</li>
+        <li><b>Suspeita de queda:</b> o quadril desce rápido <em>e</em> o corpo fica deitado. Toca um apito curto.</li>
+        <li><b>Alarme:</b> se a pessoa continua no chão pelo tempo configurado, a sirene toca até alguém clicar em "Estou bem". Se ela levanta antes, a suspeita é cancelada e registrada.</li>
+        <li><b>Movimento brusco:</b> o centro do tronco se move muito rápido. Mexer os braços não conta.</li>
+      </ol>
+    </section>
+
+    <footer>
+      <p><strong>Privacidade:</strong> o vídeo é processado no seu navegador e não é enviado a nenhum servidor. As miniaturas das ocorrências ficam apenas nesta aba. Este é um protótipo de demonstração, não um dispositivo médico: não substitui acompanhamento humano.</p>
+      <p><a href="../">Outros projetos</a> · <a href="https://github.com/rodrigosilvacio/roboflow-identify/tree/main/detector-queda">Código</a></p>
+    </footer>
+  </main>
+  <script src="fall-logic.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

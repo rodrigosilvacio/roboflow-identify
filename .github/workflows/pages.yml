@@ -31,6 +31,8 @@ jobs:
           cp contador-carros/index.html contador-carros/app.js contador-carros/style.css contador-carros/config.js _site/contador-carros/
           mkdir -p _site/detector-movimento
           cp detector-movimento/index.html detector-movimento/app.js detector-movimento/style.css detector-movimento/config.js _site/detector-movimento/
+          mkdir -p _site/detector-queda
+          cp detector-queda/index.html detector-queda/app.js detector-queda/style.css detector-queda/fall-logic.js _site/detector-queda/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
