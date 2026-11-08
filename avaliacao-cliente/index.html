@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Avaliação do Cliente</title>
+  <meta name="description" content="Totem de avaliação de atendimento: o cliente avalia com um sorriso ou com um toque, com consentimento e sem gravar imagens." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <!-- TOTEM -->
+    <section id="kiosk" class="kiosk" aria-live="polite">
+      <div id="screen-start" class="screen">
+        <h1>Como foi o seu atendimento?</h1>
+        <p class="lead">Avalie com a sua expressão ou com um toque.</p>
+        <button id="btn-camera" type="button" class="big primary">📷 Avaliar com a câmera</button>
+        <p class="consent">A câmera liga por <b>3 segundos</b>, analisa a expressão <b>neste aparelho</b> e desliga. Nenhuma imagem é gravada ou enviada. Você confirma o resultado antes de enviar.</p>
+        <p class="or">ou toque</p>
+        <div class="choices">
+          <button type="button" class="choice" data-choice="feliz"><span>😊</span>Satisfeito</button>
+          <button type="button" class="choice" data-choice="neutro"><span>😐</span>Neutro</button>
+          <button type="button" class="choice" data-choice="triste"><span>☹️</span>Insatisfeito</button>
+        </div>
+      </div>
+
+      <div id="screen-camera" class="screen" hidden>
+        <div class="cam">
+          <video id="video" playsinline muted></video>
+          <div id="countdown" class="countdown">3</div>
+          <div id="live-label" class="live-label">Procurando o rosto...</div>
+        </div>
+        <p class="lead">Olhe para a câmera e faça a sua expressão.</p>
+        <button id="btn-cancel" type="button">Cancelar</button>
+      </div>
+
+      <div id="screen-confirm" class="screen" hidden>
+        <p class="lead">Parece que você saiu</p>
+        <div id="suggest" class="suggest"><span id="suggest-emoji">😊</span><b id="suggest-name">Satisfeito</b></div>
+        <h2>Acertamos?</h2>
+        <button id="btn-yes" type="button" class="big primary">Sim, enviar</button>
+        <p class="or">Não, na verdade estou</p>
+        <div class="choices" id="fix-choices">
+          <button type="button" class="choice" data-fix="feliz"><span>😊</span>Satisfeito</button>
+          <button type="button" class="choice" data-fix="neutro"><span>😐</span>Neutro</button>
+          <button type="button" class="choice" data-fix="triste"><span>☹️</span>Insatisfeito</button>
+        </div>
+      </div>
+
+      <div id="screen-thanks" class="screen" hidden>
+        <div class="thanks-emoji" id="thanks-emoji">🙏</div>
+        <h1>Obrigado pela avaliação!</h1>
+        <p class="lead" id="thanks-text">Sua opinião ajuda a melhorar o atendimento.</p>
+      </div>
+
+      <p id="kiosk-msg" class="kiosk-msg" role="status"></p>
+    </section>
+
+    <!-- PAINEL DO GESTOR -->
+    <section id="panel" class="panel" hidden>
+      <header class="panel-head">
+        <h1>Painel do gestor</h1>
+        <a href="#" id="to-kiosk">← Voltar ao totem</a>
+      </header>
+      <div class="kpis">
+        <div class="kpi"><span>Avaliações</span><b id="k-total">0</b></div>
+        <div class="kpi"><span>Satisfação</span><b id="k-sat">—</b></div>
+        <div class="kpi"><span>Índice (satisfeitos − insatisfeitos)</span><b id="k-index">—</b></div>
+        <div class="kpi"><span>Acerto da câmera</span><b id="k-acc">—</b><small id="k-acc-n"></small></div>
+      </div>
+      <div class="bars" id="bars"></div>
+      <h2>Últimas avaliações</h2>
+      <table class="table">
+        <thead><tr><th>Horário</th><th>Avaliação</th><th>Origem</th><th>Câmera sugeriu</th></tr></thead>
+        <tbody id="rows"><tr><td colspan="4" class="muted">Nenhuma avaliação ainda.</td></tr></tbody>
+      </table>
+      <div class="panel-actions">
+        <button id="btn-csv" type="button">Baixar CSV</button>
+        <button id="btn-clear" type="button">Apagar dados</button>
+      </div>
+      <p class="muted small">MVP: os dados ficam salvos só neste navegador. Para juntar vários totens num painel único, o próximo passo é gravar no Supabase. Nenhuma imagem é armazenada: só a avaliação, o horário e a origem.</p>
+    </section>
+
+    <footer>
+      <a href="#painel" id="to-panel">Painel do gestor</a>
+      <a href="../">Outros projetos</a>
+      <a href="https://github.com/rodrigosilvacio/roboflow-identify/tree/main/avaliacao-cliente">Código</a>
+    </footer>
+  </main>
+  <script src="expression-logic.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

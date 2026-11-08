@@ -8,6 +8,7 @@ Projetos de visão computacional com Roboflow, publicados no GitHub Pages:
 | Contador de Carros | `contador-carros/` | https://rodrigosilvacio.github.io/roboflow-identify/contador-carros/ |
 | Detector de Movimento | `detector-movimento/` | https://rodrigosilvacio.github.io/roboflow-identify/detector-movimento/ |
 | Detector de Queda | `detector-queda/` | https://rodrigosilvacio.github.io/roboflow-identify/detector-queda/ |
+| Avaliação do Cliente | `avaliacao-cliente/` | https://rodrigosilvacio.github.io/roboflow-identify/avaliacao-cliente/ |
 
 ---
 
