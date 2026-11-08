@@ -6,6 +6,7 @@
   <title>Detector de Queda</title>
   <meta name="description" content="Acompanha a pessoa pela câmera e soa um alarme em caso de queda ou movimento brusco." />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../shared/consent.css" />
 </head>
 <body>
   <main>
@@ -76,6 +77,19 @@
       <p><a href="../">Outros projetos</a> · <a href="https://github.com/rodrigosilvacio/roboflow-identify/tree/main/detector-queda">Código</a></p>
     </footer>
   </main>
+  <script src="../shared/consent.js"></script>
+  <script>
+    Consent.gate({
+      id: "detector-queda",
+      title: "Antes de ligar a câmera",
+      items: [
+        "A câmera do seu dispositivo será ligada quando você clicar em \"Ligar câmera\".",
+        "O acompanhamento do corpo acontece todo no seu navegador: nenhum vídeo ou imagem é enviado.",
+        "As miniaturas das ocorrências ficam apenas nesta aba.",
+        "É um protótipo de demonstração, não um dispositivo médico."
+      ],
+    });
+  </script>
   <script src="fall-logic.js"></script>
   <script type="module" src="app.js"></script>
 </body>

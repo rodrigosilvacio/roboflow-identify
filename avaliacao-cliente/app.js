@@ -179,7 +179,27 @@ function route() {
 }
 
 // ---------- Eventos ----------
-$("#btn-camera").addEventListener("click", captureExpression);
+// Consentimento a cada cliente, antes de ligar a câmera
+$("#btn-camera").addEventListener("click", async () => {
+  const ok = await window.Consent.ask({
+    title: "Podemos usar a câmera por 3 segundos?",
+    items: [
+      "A câmera liga por 3 segundos para ler a sua expressão (sorriso, rosto sério ou triste).",
+      "A análise acontece neste aparelho. Nenhuma imagem é gravada ou enviada.",
+      "Você não é identificado. Só a avaliação e o horário são registrados.",
+      "Você confirma ou corrige o resultado antes de enviar.",
+    ],
+    accept: "Permitir e continuar",
+    decline: "Prefiro avaliar tocando",
+    note: "Este é um protótipo de visão computacional. Sem a sua permissão, a câmera não é ligada.",
+  });
+  if (!ok) {
+    show("screen-start");
+    $("#kiosk-msg").textContent = "Sem problema! Avalie tocando em uma das opções abaixo.";
+    return;
+  }
+  captureExpression();
+});
 $("#btn-cancel").addEventListener("click", () => { stopCamera(); show("screen-start"); });
 $$("[data-choice]").forEach((b) => b.addEventListener("click", () => {
   addRecord({ source: "toque", final: b.dataset.choice });

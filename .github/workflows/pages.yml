@@ -36,6 +36,7 @@ jobs:
           mkdir -p _site/avaliacao-cliente
           cp avaliacao-cliente/index.html avaliacao-cliente/app.js avaliacao-cliente/style.css avaliacao-cliente/expression-logic.js _site/avaliacao-cliente/
           cp -r vendor _site/vendor
+          cp -r shared _site/shared
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -10,6 +10,16 @@ Projetos de visão computacional com Roboflow, publicados no GitHub Pages:
 | Detector de Queda | `detector-queda/` | https://rodrigosilvacio.github.io/roboflow-identify/detector-queda/ |
 | Avaliação do Cliente | `avaliacao-cliente/` | https://rodrigosilvacio.github.io/roboflow-identify/avaliacao-cliente/ |
 
+## Consentimento (todos os projetos)
+
+Antes de usar câmera ou imagens, cada projeto mostra um aviso de **MVP de visão computacional** explicando o que é coletado, onde é processado e se algo é armazenado. A pessoa escolhe **"Concordo"** ou **"Não concordo"**.
+
+- **Sem consentimento,** a página fica bloqueada, incluindo colar e arrastar imagens, e nada é coletado.
+- **Com consentimento,** a decisão vale até fechar a aba. O botão **🔒 Privacidade** permite revogar a qualquer momento.
+- **No totem de Avaliação do Cliente,** o pedido aparece **a cada cliente**, ao tocar em "Avaliar com a câmera". Avaliar por toque não usa câmera.
+
+Componente compartilhado: `shared/consent.js` e `shared/consent.css`.
+
 ---
 
 ## Identificador de Cores

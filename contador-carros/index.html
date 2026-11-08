@@ -6,6 +6,7 @@
   <title>Contador de Carros</title>
   <meta name="description" content="Envie uma imagem e descubra quantos carros existem nela, com Roboflow." />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../shared/consent.css" />
 </head>
 <body>
   <main>
@@ -44,6 +45,18 @@
       <p><a href="../">Outros projetos</a> · <a href="https://github.com/rodrigosilvacio/roboflow-identify/tree/main/contador-carros">Código</a></p>
     </footer>
   </main>
+  <script src="../shared/consent.js"></script>
+  <script>
+    Consent.gate({
+      id: "contador-carros",
+      title: "Antes de contar veículos",
+      items: [
+        "A imagem que você enviar vai para o Roboflow (serviço de IA) só para contar os veículos.",
+        "A imagem não é armazenada por este site.",
+        "Evite enviar fotos em que pessoas ou placas possam ser identificadas."
+      ],
+    });
+  </script>
   <script src="config.js"></script>
   <script src="app.js"></script>
 </body>

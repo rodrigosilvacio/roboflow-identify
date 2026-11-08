@@ -6,6 +6,7 @@
   <title>Avaliação do Cliente</title>
   <meta name="description" content="Totem de avaliação de atendimento: o cliente avalia com um sorriso ou com um toque, com consentimento e sem gravar imagens." />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../shared/consent.css" />
 </head>
 <body>
   <main>
@@ -15,7 +16,7 @@
         <h1>Como foi o seu atendimento?</h1>
         <p class="lead">Avalie com a sua expressão ou com um toque.</p>
         <button id="btn-camera" type="button" class="big primary">📷 Avaliar com a câmera</button>
-        <p class="consent">A câmera liga por <b>3 segundos</b>, analisa a expressão <b>neste aparelho</b> e desliga. Nenhuma imagem é gravada ou enviada. Você confirma o resultado antes de enviar.</p>
+        <p class="consent">Antes de ligar a câmera, pedimos a sua permissão. Nenhuma imagem é gravada ou enviada.</p>
         <p class="or">ou toque</p>
         <div class="choices">
           <button type="button" class="choice" data-choice="feliz"><span>😊</span>Satisfeito</button>
@@ -87,6 +88,7 @@
       <a href="https://github.com/rodrigosilvacio/roboflow-identify/tree/main/avaliacao-cliente">Código</a>
     </footer>
   </main>
+  <script src="../shared/consent.js"></script>
   <script src="expression-logic.js"></script>
   <script type="module" src="app.js"></script>
 </body>

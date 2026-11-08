@@ -6,6 +6,7 @@
   <title>Identificador de Cores</title>
   <meta name="description" content="Envie uma imagem e descubra a cor dominante, com HEX, RGB e nome." />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../shared/consent.css" />
 </head>
 <body>
   <main>
@@ -49,6 +50,19 @@
       <p><a href="https://github.com/rodrigosilvacio/roboflow-identify">Código no GitHub</a></p>
     </footer>
   </main>
+  <script src="../shared/consent.js"></script>
+  <script>
+    Consent.gate({
+      id: "identificador-cores",
+      title: "Antes de analisar uma imagem",
+      items: [
+        "Você vai enviar uma imagem para descobrir a cor predominante.",
+        "Por padrão, a análise é feita no seu navegador e a imagem não sai do seu aparelho.",
+        "Se o modo Roboflow estiver ativo, a imagem é enviada ao Roboflow só para a análise e não é armazenada por este site.",
+        "Evite enviar imagens com pessoas ou informações pessoais."
+      ],
+    });
+  </script>
   <script src="config.js"></script>
   <script type="module" src="app.js"></script>
 </body>
