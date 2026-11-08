@@ -1,9 +1,15 @@
 // Detector de Queda: câmera + MediaPipe Pose (no navegador) + lógica de queda (fall-logic.js)
-const MP = window.MP_CONFIG || {
-  module: "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs",
-  wasm: "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm",
-  model: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
-};
+// Arquivos do MediaPipe servidos pelo próprio site (vendor/), com CDN do Google como reserva
+const base = new URL("./vendor/mediapipe/", import.meta.url).href;
+const MP_SOURCES = window.MP_CONFIG ? [window.MP_CONFIG] : [
+  { name: "local", module: `${base}vision_bundle.mjs`, wasm: `${base}wasm`, model: `${base}pose_landmarker_lite.task` },
+  {
+    name: "cdn",
+    module: "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/vision_bundle.mjs",
+    wasm: "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm",
+    model: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+  },
+];
 
 const $ = (s) => document.querySelector(s);
 const video = $("#video");
@@ -176,18 +182,27 @@ function loop() {
   requestAnimationFrame(loop);
 }
 
-async function loadModel() {
-  if (landmarker || window.__poseOverride) return;
-  setStatus("Carregando o modelo de pose...");
-  const { FilesetResolver, PoseLandmarker } = await import(MP.module);
-  const fileset = await FilesetResolver.forVisionTasks(MP.wasm);
+async function loadFrom(src) {
+  const { FilesetResolver, PoseLandmarker } = await import(src.module);
+  const fileset = await FilesetResolver.forVisionTasks(src.wasm);
   const opts = (delegate) => ({
-    baseOptions: { modelAssetPath: MP.model, delegate },
+    baseOptions: { modelAssetPath: src.model, delegate },
     runningMode: "VIDEO", numPoses: 1,
     minPoseDetectionConfidence: 0.5, minPosePresenceConfidence: 0.5, minTrackingConfidence: 0.5,
   });
-  try { landmarker = await PoseLandmarker.createFromOptions(fileset, opts("GPU")); }
-  catch { landmarker = await PoseLandmarker.createFromOptions(fileset, opts("CPU")); } // sem GPU
+  try { return await PoseLandmarker.createFromOptions(fileset, opts("GPU")); }
+  catch { return await PoseLandmarker.createFromOptions(fileset, opts("CPU")); } // sem GPU
+}
+
+async function loadModel() {
+  if (landmarker || window.__poseOverride) return;
+  setStatus("Carregando o modelo de pose...");
+  let lastError;
+  for (const src of MP_SOURCES) {
+    try { landmarker = await loadFrom(src); window.__mpSource = src.name; return; }
+    catch (e) { lastError = e; console.warn(`MediaPipe (${src.name}) falhou`, e); }
+  }
+  throw lastError;
 }
 
 async function start() {
