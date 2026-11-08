@@ -1,6 +1,6 @@
 // Detector de Queda: câmera + MediaPipe Pose (no navegador) + lógica de queda (fall-logic.js)
-// Arquivos do MediaPipe servidos pelo próprio site (vendor/), com CDN do Google como reserva
-const base = new URL("./vendor/mediapipe/", import.meta.url).href;
+// Arquivos do MediaPipe servidos pelo próprio site (vendor/ na raiz), com CDN do Google como reserva
+const base = new URL("../vendor/mediapipe/", import.meta.url).href;
 const MP_SOURCES = window.MP_CONFIG ? [window.MP_CONFIG] : [
   { name: "local", module: `${base}vision_bundle.mjs`, wasm: `${base}wasm`, model: `${base}pose_landmarker_lite.task` },
   {

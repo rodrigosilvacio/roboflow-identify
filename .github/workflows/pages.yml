@@ -33,7 +33,10 @@ jobs:
           cp detector-movimento/index.html detector-movimento/app.js detector-movimento/style.css detector-movimento/config.js _site/detector-movimento/
           mkdir -p _site/detector-queda
           cp detector-queda/index.html detector-queda/app.js detector-queda/style.css detector-queda/fall-logic.js _site/detector-queda/
-          cp -r detector-queda/vendor _site/detector-queda/vendor
+          mkdir -p _site/avaliacao-cliente
+          cp avaliacao-cliente/index.html avaliacao-cliente/app.js avaliacao-cliente/style.css avaliacao-cliente/expression-logic.js _site/avaliacao-cliente/
+          cp -r vendor _site/vendor
+          cp -r shared _site/shared
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -6,6 +6,7 @@
   <title>Detector de Movimento</title>
   <meta name="description" content="Deixe a câmera ligada: o sistema avisa quando uma pessoa passar." />
   <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../shared/consent.css" />
 </head>
 <body>
   <main>
@@ -69,6 +70,19 @@
       <p><a href="../">Outros projetos</a> · <a href="https://github.com/rodrigosilvacio/roboflow-identify/tree/main/detector-movimento">Código</a></p>
     </footer>
   </main>
+  <script src="../shared/consent.js"></script>
+  <script>
+    Consent.gate({
+      id: "detector-movimento",
+      title: "Antes de ligar a câmera",
+      items: [
+        "A câmera do seu dispositivo será ligada quando você clicar em \"Ligar câmera\".",
+        "O vídeo é analisado no seu navegador. Só quando há movimento, um quadro é enviado ao Roboflow para verificar se há uma pessoa ou um celular, sem armazenamento.",
+        "As miniaturas dos alertas ficam apenas nesta aba e somem ao fechá-la.",
+        "Avise as pessoas do ambiente que há uma câmera ligada."
+      ],
+    });
+  </script>
   <script src="config.js"></script>
   <script src="app.js"></script>
 </body>

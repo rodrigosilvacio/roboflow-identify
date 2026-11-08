@@ -41,7 +41,7 @@ Também foi testado com o modelo MediaPipe real no Chromium, usando vídeos como
 
 ## Dependências
 
-O MediaPipe (`@mediapipe/tasks-vision` 0.10.14, licença Apache-2.0) e o modelo `pose_landmarker_lite` ficam em `vendor/mediapipe/`, servidos pelo próprio site. Assim a página não depende de CDN externo. Se a cópia local falhar, a página tenta o CDN do Google como reserva. Não há conta, chave ou cobrança.
+O MediaPipe (`@mediapipe/tasks-vision` 0.10.14, licença Apache-2.0) e o modelo `pose_landmarker_lite` ficam em `vendor/mediapipe/` (na raiz do repositório, compartilhados com outros projetos), servidos pelo próprio site. Assim a página não depende de CDN externo. Se a cópia local falhar, a página tenta o CDN do Google como reserva. Não há conta, chave ou cobrança.
 
 ## Limitações do MVP
 
