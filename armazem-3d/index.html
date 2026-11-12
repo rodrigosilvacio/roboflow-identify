@@ -17,6 +17,7 @@
         <p>Navegue pelo armazém sem tocar no computador. Os dados e o layout são fictícios.</p>
       </div>
       <div class="view-tools" role="group" aria-label="Vista">
+        <button id="sim" type="button" class="sim" aria-pressed="false">▶ Simular gestos</button>
         <button id="zoom-in" type="button" aria-label="Aproximar">+</button>
         <button id="zoom-out" type="button" aria-label="Afastar">−</button>
         <button id="reset" type="button">Vista geral</button>
@@ -26,7 +27,20 @@
     <section class="grid">
       <div class="stage" id="stage" aria-label="Armazém em 3D. Com o mouse: arraste para girar, botão direito para mover, roda para zoom, clique para selecionar um módulo.">
         <canvas id="scene"></canvas>
-        <div class="hint" id="hint">Arraste para girar · roda para zoom · clique numa estante</div>
+        <div id="mode" class="mode" hidden role="status" aria-live="polite"></div>
+        <div id="tip" class="tip" hidden aria-hidden="true"></div>
+        <div id="ripple" class="ripple" aria-hidden="true"></div>
+        <div id="loc-card" class="loc-card" hidden role="region" aria-label="Local selecionado">
+          <p class="loc-kicker">📍 Local selecionado</p>
+          <h3 id="loc-title"></h3>
+          <p class="loc-code">Endereço: <b id="loc-code"></b></p>
+          <ul id="loc-lines"></ul>
+          <div class="loc-actions">
+            <button id="loc-home" type="button">Vista geral</button>
+            <button id="loc-close" type="button">Fechar</button>
+          </div>
+        </div>
+        <div class="hint" id="hint">Clique em qualquer lugar para ver o local · arraste para girar · roda para zoom · ou ▶ Simular gestos</div>
       </div>
 
       <aside class="panel">
@@ -46,26 +60,25 @@
           <button id="stop" type="button" disabled>Parar câmera</button>
         </div>
         <p id="status" class="status" role="status" aria-live="polite">Ligue a câmera e mostre a mão para começar.</p>
+        <label class="sens">Sensibilidade
+          <select id="sens">
+            <option value="baixa" selected>Baixa (mais estável)</option>
+            <option value="media">Média</option>
+            <option value="alta">Alta (mais rápida)</option>
+          </select>
+        </label>
 
         <h3>Gestos disponíveis</h3>
         <ul class="gestures">
           <li><span>☝️</span><div><b>Indicador:</b> mover o cursor</div></li>
-          <li><span>🤏</span><div><b>Pinça:</b> clicar (selecionar estante) e arrastar (girar a vista)</div></li>
-          <li><span>✋</span><div><b>Palma em movimento:</b> mover a vista. Aproxime a palma da câmera para dar zoom; afaste para sair</div></li>
+          <li><span>🤏</span><div><b>Pinça rápida:</b> clicar e ver o local. <b>Pinça e mover:</b> girar a vista</div></li>
+          <li><span>✋</span><div><b>Palma aberta (segure 0,4 s) e mova:</b> mover a vista. Aproxime a palma da câmera para dar zoom; afaste para sair</div></li>
           <li><span>🙌</span><div><b>Pinça com as duas mãos:</b> zoom, como no celular</div></li>
           <li><span>✊</span><div><b>Mão fechada:</b> pausa (descanse sem mexer em nada)</div></li>
         </ul>
 
-        <div class="info" id="info" hidden>
-          <h3 id="info-title">Estante</h3>
-          <dl>
-            <div><dt>Níveis</dt><dd id="info-levels">—</dd></div>
-            <div><dt>Ocupação</dt><dd id="info-occ">—</dd></div>
-          </dl>
-          <div class="bar"><div id="info-bar"></div></div>
-        </div>
-        <h3>Módulos selecionados <small id="sel-count"></small></h3>
-        <ol id="sel-list" class="sel-list"><li class="empty">Clique ou faça pinça numa estante.</li></ol>
+        <h3>Locais clicados <small id="sel-count"></small></h3>
+        <ol id="sel-list" class="sel-list"><li class="empty">Clique (ou faça pinça) em qualquer lugar do armazém.</li></ol>
 
         <details class="diag-box">
           <summary>Diagnóstico</summary>
@@ -86,7 +99,7 @@
     </footer>
   </main>
 
-  <div id="cursor" class="cursor" hidden aria-hidden="true"><span class="ring"></span><span class="dot"></span></div>
+  <div id="cursor" class="cursor" hidden aria-hidden="true"><span class="ring"></span><span class="prog"></span><span class="dot"></span></div>
   <div id="zoom-dot-a" class="zoom-dot" hidden aria-hidden="true"></div>
   <div id="zoom-dot-b" class="zoom-dot" hidden aria-hidden="true"></div>
 

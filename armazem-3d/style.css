@@ -69,7 +69,44 @@ footer a { color: var(--accent); }
 .cursor .ring { position: absolute; inset: 0; border-radius: 50%; border: 4px solid var(--accent); background: rgba(255,255,255,.35); box-shadow: 0 0 0 2px rgba(0,0,0,.45); }
 .cursor .dot { position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: #0b1b2b; }
 .cursor[data-mode="pinca"] .ring { border-color: var(--ok); transform: scale(.82); }
-.cursor[data-mode="palma"] .ring { border-color: #f5c518; border-style: dashed; }
+.cursor[data-mode="palma"] .ring { border-color: #f5c518; }
+.cursor[data-mode="palma-espera"] .ring { border-color: rgba(245,197,24,.35); }
+.cursor .prog { position: absolute; inset: -6px; border-radius: 50%; display: none;
+  background: conic-gradient(#f5c518 calc(var(--p, 0) * 1turn), transparent 0);
+  -webkit-mask: radial-gradient(circle, transparent 26px, #000 27px); mask: radial-gradient(circle, transparent 26px, #000 27px); }
+.cursor[data-mode="palma-espera"] .prog { display: block; }
 .cursor[data-mode="pausa"] { opacity: .35; }
 .zoom-dot { position: fixed; left: 0; top: 0; width: 24px; height: 24px; margin: -12px 0 0 -12px; border-radius: 50%; pointer-events: none; z-index: 800;
             background: rgba(247,120,186,.85); border: 3px solid #fff; }
+
+/* Faixa de modo: deixa claro o que o gesto está fazendo agora */
+.mode { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); max-width: calc(100% - 24px); padding: 8px 16px; border-radius: 999px;
+        background: rgba(13,17,23,.82); color: #fff; font-weight: 650; font-size: .95rem; text-align: center; box-shadow: 0 6px 18px rgba(0,0,0,.25); pointer-events: none; }
+.mode[data-kind="point"] { background: rgba(31,111,235,.92); }
+.mode[data-kind="pinch"], .mode[data-kind="drag"] { background: rgba(26,127,55,.92); }
+.mode[data-kind="palm"] { background: rgba(154,103,0,.94); }
+.mode[data-kind="pause"] { background: rgba(87,96,106,.92); }
+.mode[data-kind="zoom"] { background: rgba(191,57,137,.92); }
+/* Etiqueta junto ao cursor: o local que está sendo apontado */
+.tip { position: absolute; left: 0; top: 0; padding: 4px 10px; border-radius: 8px; background: #fff; color: #0b1b2b; font-size: .85rem; font-weight: 650;
+       box-shadow: 0 4px 12px rgba(0,0,0,.25); border: 2px solid var(--accent); pointer-events: none; white-space: nowrap; }
+/* Efeito do clique */
+.ripple { position: absolute; width: 20px; height: 20px; margin: -10px 0 0 -10px; border-radius: 50%; border: 4px solid #e5484d; opacity: 0; pointer-events: none; }
+.ripple.go { animation: ripple .6s ease-out; }
+@keyframes ripple { 0% { transform: scale(.5); opacity: 1; } 100% { transform: scale(5); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .ripple.go { animation: none; } }
+/* Cartão do local clicado */
+.loc-card { position: absolute; left: 12px; top: 60px; width: min(340px, calc(100% - 24px)); padding: 14px 16px; border-radius: 14px;
+            background: var(--surface); color: var(--text); border: 2px solid #e5484d; box-shadow: 0 10px 30px rgba(0,0,0,.3); }
+.loc-kicker { margin: 0; color: #e5484d; font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; }
+.loc-card h3 { margin: 4px 0 6px; font-size: 1.1rem; line-height: 1.3; }
+.loc-code { margin: 0 0 6px; color: var(--muted); font-size: .88rem; }
+.loc-code b { color: var(--text); font-variant-numeric: tabular-nums; }
+.loc-card ul { margin: 0 0 10px; padding-left: 18px; font-size: .92rem; }
+.loc-actions { display: flex; gap: 8px; }
+.loc-actions button { padding: 6px 12px; font-size: .88rem; }
+.sim { background: #1a7f37; border-color: #1a7f37; color: #fff; font-weight: 600; }
+.sim[aria-pressed="true"] { background: #b42318; border-color: #b42318; }
+.sens { display: flex; gap: 8px; align-items: center; margin-top: 8px; font-size: .88rem; color: var(--muted); }
+.sens select { font: inherit; padding: 4px 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+@media (max-width: 600px) { .loc-card { top: auto; bottom: 48px; } .mode { font-size: .82rem; } }
