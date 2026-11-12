@@ -12,7 +12,7 @@
   <main>
     <header>
       <h1>Vitrine por Gestos</h1>
-      <p>Aponte com o dedo indicador para um produto. <b>Pare sobre ele por 1 segundo</b> ou <b>faça uma pinça</b> (polegar no indicador) para adicioná-lo à lista.</p>
+      <p>Controle a prateleira com as mãos: <b>aponte</b> para escolher, <b>pinça com as duas mãos</b> para dar zoom e <b>mão fechada</b> para arrastar.</p>
     </header>
 
     <div class="toolbar">
@@ -24,19 +24,33 @@
         <button id="zoom-in" type="button" aria-label="Aumentar zoom">+</button>
         <button id="zoom-fit" type="button">Ver tudo</button>
       </div>
+      <label class="delegate">Processador
+        <select id="delegate">
+          <option value="auto">Automático</option>
+          <option value="gpu">GPU</option>
+          <option value="cpu">CPU</option>
+        </select>
+      </label>
       <span id="status" class="status" role="status" aria-live="polite">Sem câmera: use o mouse para testar.</span>
     </div>
 
     <section class="grid">
       <div class="viewport" id="viewport" tabindex="0" aria-label="Prateleiras. Use + e − para zoom e as setas para mover.">
         <div class="store" id="store"></div>
+        <div class="hand-controls" aria-label="Zoom pela mão">
+          <button type="button" class="hand-btn" data-action="zoom-in" aria-label="Aproximar">🔍+</button>
+          <button type="button" class="hand-btn" data-action="zoom-out" aria-label="Afastar">🔍−</button>
+          <button type="button" class="hand-btn" data-action="fit" aria-label="Ver tudo">⤢</button>
+        </div>
         <div class="cam" id="cam" hidden>
           <video id="video" playsinline muted></video>
           <canvas id="hand-canvas"></canvas>
+          <span id="gesture" class="gesture">Procurando a mão...</span>
         </div>
       </div>
 
       <aside class="panel">
+        <p id="diag" class="diag">Diagnóstico aparece ao ligar a câmera.</p>
         <div class="now">
           <span class="label">Apontando agora</span>
           <b id="pointing">—</b>
@@ -45,13 +59,15 @@
         <ol id="legend" class="legend"><li class="empty">Aponte para um produto para começar.</li></ol>
         <button id="clear" type="button">Limpar lista</button>
 
-        <h2>Como usar</h2>
-        <ul class="howto">
-          <li><b>Apontar:</b> o cursor segue a ponta do seu indicador.</li>
-          <li><b>Selecionar:</b> pare 1 s sobre o produto (o anel enche) ou faça uma pinça.</li>
-          <li><b>Zoom:</b> botões + e −, a roda do mouse ou as teclas + e −.</li>
-          <li><b>Mover com zoom:</b> leve o cursor até a borda da prateleira, arraste com o mouse ou use as setas.</li>
+        <h2>Gestos</h2>
+        <ul class="howto gestures">
+          <li><span>☝️</span><div><b>Apontar</b> com o indicador move o cursor. Parar 1 s sobre o produto seleciona.</div></li>
+          <li><span>🤏</span><div><b>Pinça</b> (polegar no indicador) seleciona na hora.</div></li>
+          <li><span>🙌</span><div><b>Pinça com as duas mãos</b>: afaste para aproximar, junte para afastar. Mover as duas desloca a vista.</div></li>
+          <li><span>✊</span><div><b>Mão fechada</b> agarra e arrasta a prateleira (com zoom).</div></li>
+          <li><span>🔍</span><div>Com uma mão só: aponte para <b>🔍+ / 🔍− / ⤢</b> no canto da prateleira.</div></li>
         </ul>
+        <p class="tip">Dica: fique a 50 a 80 cm da câmera, com luz de frente e a mão inteira na imagem.</p>
       </aside>
     </section>
 
@@ -61,7 +77,9 @@
     </footer>
   </main>
 
-  <div id="cursor" class="cursor" hidden aria-hidden="true"><span class="ring"></span><span class="dot"></span></div>
+  <div id="cursor" class="cursor" hidden aria-hidden="true"><span class="ring"></span><span class="dot"></span><span class="icon"></span></div>
+  <div id="zoom-dot-a" class="zoom-dot" hidden aria-hidden="true"></div>
+  <div id="zoom-dot-b" class="zoom-dot" hidden aria-hidden="true"></div>
 
   <script src="../shared/consent.js"></script>
   <script>

@@ -114,7 +114,67 @@
     reset() { this.ms = {}; this.lastT = null; }
   }
 
-  const api = { OneEuroFilter, PointFilter, mapToScreen, DEFAULT_BOX, handSize, PinchDetector, DwellSelector, TargetHistory, AttentionTracker };
+  // ---------- Gestos pelos dedos esticados ----------
+  // Dedo esticado: a ponta está bem mais longe do punho que a articulação do meio (PIP).
+  const FINGERS = { index: [8, 6], middle: [12, 10], ring: [16, 14], pinky: [20, 18] };
+  function fingerStates(lm) {
+    const out = {};
+    for (const [name, [tip, pip]] of Object.entries(FINGERS)) out[name] = dist(lm[tip], lm[0]) > dist(lm[pip], lm[0]) * 1.12;
+    return out;
+  }
+  // aponta (☝️), pinca (🤏), punho (✊) ou aberta (✋)
+  function classifyGesture(lm, pinched = false) {
+    if (!lm) return null;
+    if (pinched) return "pinca";
+    const f = fingerStates(lm);
+    const others = [f.middle, f.ring, f.pinky].filter(Boolean).length;
+    if (!f.index && others === 0) return "punho";
+    if (f.index && others <= 1) return "aponta";
+    if (f.index && others >= 2) return "aberta";
+    return "punho"; // indicador dobrado com outros dedos esticados: trata como mão fechada
+  }
+  // Evita "piscar" entre gestos: só troca depois de estável por alguns milissegundos
+  class GestureStabilizer {
+    constructor(holdMs = 120) { this.holdMs = holdMs; this.current = null; this.candidate = null; this.since = 0; }
+    reset() { this.current = null; this.candidate = null; }
+    update(g, t) {
+      if (g === this.current) { this.candidate = null; return this.current; }
+      if (g !== this.candidate) { this.candidate = g; this.since = t; }
+      // a pinça e a perda da mão valem na hora (seleção precisa ser imediata)
+      if (g === "pinca" || g === null || t - this.since >= this.holdMs) { this.current = g; this.candidate = null; }
+      return this.current;
+    }
+  }
+
+  // ---------- Zoom com as duas mãos em pinça ----------
+  // Pontos de pinça já em coordenadas de tela. Retorna fator de zoom e deslocamento desde o quadro anterior.
+  class TwoHandZoom {
+    constructor() { this.prev = null; }
+    reset() { this.prev = null; }
+    update(a, b) {
+      if (!a || !b) { this.prev = null; return { active: false }; }
+      const d = Math.max(1e-6, Math.hypot(a.x - b.x, a.y - b.y));
+      const c = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      if (!this.prev) { this.prev = { d, c }; return { active: true, factor: 1, center: c, pan: { x: 0, y: 0 } }; }
+      const out = { active: true, factor: d / this.prev.d, center: c, pan: { x: c.x - this.prev.c.x, y: c.y - this.prev.c.y } };
+      this.prev = { d, c };
+      return out;
+    }
+  }
+
+  // ---------- Arrastar com a mão fechada ----------
+  class GrabPan {
+    constructor() { this.prev = null; }
+    reset() { this.prev = null; }
+    update(p) { // p: posição da mão na tela, ou null quando solta
+      if (!p) { this.prev = null; return { x: 0, y: 0 }; }
+      const d = this.prev ? { x: p.x - this.prev.x, y: p.y - this.prev.y } : { x: 0, y: 0 };
+      this.prev = p;
+      return d;
+    }
+  }
+
+  const api = { OneEuroFilter, PointFilter, mapToScreen, DEFAULT_BOX, handSize, PinchDetector, DwellSelector, TargetHistory, AttentionTracker, fingerStates, classifyGesture, GestureStabilizer, TwoHandZoom, GrabPan };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.HandLogic = api;
 })(typeof window !== "undefined" ? window : globalThis);
