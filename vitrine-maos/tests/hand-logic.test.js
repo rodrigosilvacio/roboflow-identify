@@ -1,7 +1,7 @@
 // Testes da lógica da Vitrine por Gestos.
 // Rodar: node vitrine-maos/tests/hand-logic.test.js
 const assert = require("node:assert/strict");
-const { OneEuroFilter, mapToScreen, PinchDetector, DwellSelector, TargetHistory, AttentionTracker } = require("../hand-logic.js");
+const { OneEuroFilter, mapToScreen, PinchDetector, DwellSelector, TargetHistory, AttentionTracker, classifyGesture, GestureStabilizer, TwoHandZoom, GrabPan } = require("../hand-logic.js");
 
 // Mão sintética: punho em (wx, wy), tamanho s; pinchGap = distância polegar-indicador em "tamanhos de mão"
 function hand({ wx = 0.5, wy = 0.7, s = 0.15, pinchGap = 0.8 } = {}) {
@@ -118,6 +118,49 @@ test("atenção: soma o tempo por produto e ignora pausas longas", () => {
   a.update("pera", 5050);
   assert.ok(Math.abs(a.get("banana") - 1000) <= 50, `banana ${a.get("banana")}`);
   assert.ok(a.get("pera") <= 300, `pera ${a.get("pera")}`);
+});
+
+// Mão anatômica: cada dedo com PIP e ponta; esticado = ponta longe do punho, dobrado = ponta perto da palma
+function poseHand(ext = {}) {
+  const w = { x: 0.5, y: 0.8 }, lm = Array.from({ length: 21 }, () => ({ x: w.x, y: w.y, z: 0 }));
+  lm[0] = w; lm[9] = { x: 0.5, y: 0.65 };
+  const cols = { index: [0.44, 8, 6], middle: [0.5, 12, 10], ring: [0.56, 16, 14], pinky: [0.61, 20, 18] };
+  for (const [name, [x, tip, pip]] of Object.entries(cols)) {
+    lm[pip] = { x, y: 0.58, z: 0 };
+    lm[tip] = ext[name] ? { x, y: 0.45, z: 0 } : { x, y: 0.66, z: 0 }; // dobrado: ponta volta para perto da palma
+  }
+  lm[4] = { x: 0.36, y: 0.66, z: 0 }; lm[8] = lm[8];
+  return lm;
+}
+test("gesto: só o indicador esticado = aponta", () => assert.equal(classifyGesture(poseHand({ index: true })), "aponta"));
+test("gesto: indicador e médio (sinal de paz) ainda aponta", () => assert.equal(classifyGesture(poseHand({ index: true, middle: true })), "aponta"));
+test("gesto: todos dobrados = punho", () => assert.equal(classifyGesture(poseHand({})), "punho"));
+test("gesto: todos esticados = mão aberta", () => assert.equal(classifyGesture(poseHand({ index: true, middle: true, ring: true, pinky: true })), "aberta"));
+test("gesto: pinça tem prioridade", () => assert.equal(classifyGesture(poseHand({ index: true }), true), "pinca"));
+test("gesto: estabilizador ignora piscadas curtas, mas a pinça vale na hora", () => {
+  const g = new GestureStabilizer(120);
+  assert.equal(g.update("aponta", 0), null);
+  assert.equal(g.update("aponta", 130), "aponta");
+  assert.equal(g.update("punho", 160), "aponta");   // só 30 ms de punho: ignora
+  assert.equal(g.update("aponta", 190), "aponta");
+  assert.equal(g.update("pinca", 220), "pinca");     // pinça: imediata
+  assert.equal(g.update("punho", 240), "pinca");
+  assert.equal(g.update("punho", 370), "punho");     // punho estável por 130 ms
+});
+test("zoom com duas mãos: afastar aumenta, aproximar diminui, centro acompanha", () => {
+  const z = new TwoHandZoom();
+  assert.equal(z.update({ x: 400, y: 300 }, { x: 600, y: 300 }).factor, 1);
+  const r = z.update({ x: 350, y: 300 }, { x: 650, y: 300 });
+  assert.ok(Math.abs(r.factor - 1.5) < 1e-9 && r.center.x === 500);
+  assert.ok(z.update({ x: 450, y: 300 }, { x: 550, y: 300 }).factor < 1);
+  assert.equal(z.update(null, { x: 1, y: 1 }).active, false);
+});
+test("arrastar com punho: devolve o deslocamento entre quadros", () => {
+  const g = new GrabPan();
+  assert.deepEqual(g.update({ x: 100, y: 100 }), { x: 0, y: 0 });
+  assert.deepEqual(g.update({ x: 130, y: 90 }), { x: 30, y: -10 });
+  assert.deepEqual(g.update(null), { x: 0, y: 0 });
+  assert.deepEqual(g.update({ x: 500, y: 500 }), { x: 0, y: 0 }); // soltou e agarrou de novo: sem salto
 });
 
 let fail = 0;

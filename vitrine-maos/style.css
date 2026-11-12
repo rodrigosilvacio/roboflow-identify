@@ -51,7 +51,7 @@ button:focus-visible, .viewport:focus-visible { outline: 3px solid var(--accent)
 @media (prefers-reduced-motion: reduce) { .product, .store { transition: none; } .product.flash { animation: none; } }
 
 /* Miniatura da câmera */
-.cam { position: absolute; right: 12px; bottom: 12px; width: 200px; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden;
+.cam { position: absolute; right: 12px; bottom: 12px; width: 260px; aspect-ratio: 4 / 3; border-radius: 12px; overflow: hidden;
        border: 2px solid rgba(255,255,255,.7); background: #000; box-shadow: 0 6px 18px rgba(0,0,0,.35); }
 .cam video, .cam canvas { position: absolute; inset: 0; width: 100%; height: 100%; transform: scaleX(-1); }
 .cam video { object-fit: cover; }
@@ -63,8 +63,13 @@ button:focus-visible, .viewport:focus-visible { outline: 3px solid var(--accent)
                 -webkit-mask: radial-gradient(circle, transparent 20px, #000 21px); mask: radial-gradient(circle, transparent 20px, #000 21px); }
 .cursor .dot { position: absolute; left: 50%; top: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%;
                background: var(--accent); border: 2px solid #fff; }
-.cursor.pinched .dot { background: var(--ok); transform: scale(1.4); }
-.cursor.hand .ring { box-shadow: 0 0 0 2px rgba(255,255,255,.6); }
+.cursor[data-mode="pinca"] .dot { background: var(--ok); transform: scale(1.4); }
+.cursor[data-mode="punho"] .ring, .cursor[data-mode="punho"] .dot { display: none; }
+.cursor .icon { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 30px; display: none; }
+.cursor[data-mode="punho"] .icon { display: block; }
+.cursor[data-mode="punho"] .icon::after { content: "✊"; }
+.zoom-dot { position: fixed; left: 0; top: 0; width: 26px; height: 26px; margin: -13px 0 0 -13px; border-radius: 50%; pointer-events: none; z-index: 800;
+            background: rgba(247,120,186,.85); border: 3px solid #fff; box-shadow: 0 0 0 4px rgba(247,120,186,.35); }
 
 /* Painel */
 .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px; }
@@ -85,3 +90,18 @@ button:focus-visible, .viewport:focus-visible { outline: 3px solid var(--accent)
 .howto b { color: var(--text); }
 footer { margin-top: 24px; color: var(--muted); font-size: .85rem; }
 footer a { color: var(--accent); }
+
+/* Botões de zoom acionáveis pela mão */
+.hand-controls { position: absolute; top: 12px; right: 12px; display: grid; gap: 10px; z-index: 5; }
+.hand-btn { width: 64px; height: 64px; border-radius: 16px; font-size: 1.3rem; font-weight: 700; padding: 0;
+            background: color-mix(in srgb, var(--surface) 88%, transparent); border: 2px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+.hand-btn.hover { border-color: var(--accent); background: var(--accent); color: #fff; }
+.gesture { position: absolute; left: 8px; bottom: 8px; padding: 3px 10px; border-radius: 999px; background: rgba(0,0,0,.65); color: #fff; font-size: .8rem; font-weight: 600; }
+.delegate { display: inline-flex; gap: 6px; align-items: center; color: var(--muted); font-size: .9rem; }
+.delegate select { font: inherit; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface); color: var(--text); }
+.diag { margin: 0 0 12px; padding: 8px 10px; border-radius: 10px; background: var(--bg); color: var(--muted); font-size: .8rem; font-variant-numeric: tabular-nums; }
+.gestures { list-style: none; padding: 0; gap: 8px; }
+.gestures li { display: grid; grid-template-columns: 28px 1fr; gap: 6px; align-items: start; }
+.gestures span { font-size: 1.25rem; line-height: 1.3; }
+.tip { margin: 10px 0 0; color: var(--muted); font-size: .85rem; }
+@media (max-width: 600px) { .cam { width: 160px; } .hand-btn { width: 52px; height: 52px; } }
