@@ -10,6 +10,7 @@ Projetos de visão computacional com Roboflow, publicados no GitHub Pages:
 | Detector de Queda | `detector-queda/` | https://rodrigosilvacio.github.io/roboflow-identify/detector-queda/ |
 | Avaliação do Cliente | `avaliacao-cliente/` | https://rodrigosilvacio.github.io/roboflow-identify/avaliacao-cliente/ |
 | Vitrine por Gestos | `vitrine-maos/` | https://rodrigosilvacio.github.io/roboflow-identify/vitrine-maos/ |
+| Armazém 3D por Gestos | `armazem-3d/` | https://rodrigosilvacio.github.io/roboflow-identify/armazem-3d/ |
 
 ## Consentimento (todos os projetos)
 
