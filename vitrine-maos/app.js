@@ -244,7 +244,7 @@ viewport.addEventListener("click", (e) => {
 });
 
 // ---------- Câmera e MediaPipe ----------
-let landmarker = null, stream = null, running = false, lostAt = 0, delegateUsed = "-", gpuErrors = 0, runningSince = 0, autoChecked = false;
+let landmarker = null, stream = null, running = false, lostAt = 0, delegateUsed = "-", gpuErrors = 0, runningSince = 0, autoChecked = false, startFrames = 0, firstFrameAt = 0;
 const perHand = {}; // por mão (Left/Right): filtro do cursor, pinça e estabilizador de gesto
 const handState = (key) => (perHand[key] ||= { filter: new PointFilter(), pinch: new PinchDetector(), gesture: new GestureStabilizer(), pinchPt: new PointFilter() });
 const twoZoom = new TwoHandZoom(), grab = new GrabPan();
@@ -357,11 +357,11 @@ function loop() {
     });
     updateDiag(now, hands.length);
     // Modo automático: se a GPU estiver lenta (algumas placas travam ao devolver o resultado), troca para a CPU
-    // (só decide com pelo menos 1,5 s de quadros reais: a primeira análise na GPU costuma demorar para "aquecer")
-    const measured = stats.recent.length > 1 && now - stats.recent[0].t >= 1500;
-    if (!autoChecked && delegateUsed === "GPU" && preferredDelegate() === "auto" && measured && now - runningSince > 2500) {
+    // mede desde o início (funciona mesmo com menos de 1 quadro/s); a primeira análise na GPU costuma demorar a "aquecer"
+    if (stats.frames - startFrames === 1) firstFrameAt = now;
+    if (!autoChecked && delegateUsed === "GPU" && preferredDelegate() === "auto" && now - runningSince > 3000 && stats.frames - startFrames >= 3) {
       autoChecked = true;
-      const fpsNow = Math.round(((stats.recent.length - 1) * 1000) / (now - stats.recent[0].t));
+      const fpsNow = Math.round(((stats.frames - startFrames - 1) * 1000) / (now - firstFrameAt));
       if (fpsNow < 10) { running = false; fallbackToCPU(`GPU lenta (${fpsNow} quadros/s)`).then(() => { running = true; requestAnimationFrame(loop); }); return; }
     }
     handleHands(hands, now);
@@ -431,7 +431,7 @@ async function start() {
   setStatus("Carregando o modelo de mãos...");
   try { await loadModel(); }
   catch (e) { stop(); return setStatus(`Não foi possível carregar o modelo de mãos: ${e.message}`, "error"); }
-  running = true; runningSince = performance.now(); autoChecked = false;
+  running = true; runningSince = performance.now(); autoChecked = false; startFrames = stats.frames;
   $("#start").hidden = true; $("#stop").hidden = false;
   setStatus("Mostre a mão para a câmera e aponte com o indicador.", "ok");
   requestAnimationFrame(loop);

@@ -174,7 +174,55 @@
     }
   }
 
-  const api = { OneEuroFilter, PointFilter, mapToScreen, DEFAULT_BOX, handSize, PinchDetector, DwellSelector, TargetHistory, AttentionTracker, fingerStates, classifyGesture, GestureStabilizer, TwoHandZoom, GrabPan };
+  // ---------- Palma em movimento: desloca a vista; aproximar/afastar a palma dá zoom ----------
+  // p: centro da palma em coordenadas de tela (0..1); size: tamanho da mão (punho até a base do médio).
+  // Mão perto da câmera parece maior: o aumento do tamanho vira zoom de aproximação.
+  class PalmNavigator {
+    constructor({ smoothing = 0.5, moveDeadzone = 0.002, zoomDeadzone = 0.006 } = {}) {
+      Object.assign(this, { smoothing, moveDeadzone, zoomDeadzone });
+      this.reset();
+    }
+    reset() { this.prev = null; this.f = null; }
+    update(p, size) {
+      if (!p || !size) { this.reset(); return { dx: 0, dy: 0, zoom: 1 }; }
+      const a = this.f ? this.smoothing : 0;
+      this.f = this.f
+        ? { x: this.f.x * a + p.x * (1 - a), y: this.f.y * a + p.y * (1 - a), s: this.f.s * a + size * (1 - a) }
+        : { x: p.x, y: p.y, s: size };
+      if (!this.prev) { this.prev = { ...this.f }; return { dx: 0, dy: 0, zoom: 1 }; }
+      let dx = this.f.x - this.prev.x, dy = this.f.y - this.prev.y;
+      if (Math.hypot(dx, dy) < this.moveDeadzone) { dx = 0; dy = 0; }
+      let zoom = this.f.s / this.prev.s;
+      if (Math.abs(Math.log(zoom)) < this.zoomDeadzone) zoom = 1;
+      this.prev = { ...this.f };
+      return { dx, dy, zoom };
+    }
+  }
+
+  // ---------- Pinça: clicar e arrastar ----------
+  // Pinça curta, sem mexer, é um clique. Pinça com movimento é arrasto (devolve o deslocamento por quadro).
+  class PinchDrag {
+    constructor({ clickTolerance = 14, maxClickMs = 600 } = {}) { Object.assign(this, { clickTolerance, maxClickMs }); this.state = null; }
+    reset() { this.state = null; }
+    update(pinched, p, t) { // p em pixels de tela
+      if (pinched && !this.state) { this.state = { start: p, last: p, t0: t, moved: 0, dragging: false }; return { phase: "down", dx: 0, dy: 0 }; }
+      if (pinched && this.state) {
+        const dx = p.x - this.state.last.x, dy = p.y - this.state.last.y;
+        this.state.moved = Math.max(this.state.moved, Math.hypot(p.x - this.state.start.x, p.y - this.state.start.y));
+        this.state.last = p;
+        if (!this.state.dragging && this.state.moved > this.clickTolerance) this.state.dragging = true;
+        return { phase: this.state.dragging ? "drag" : "hold", dx: this.state.dragging ? dx : 0, dy: this.state.dragging ? dy : 0 };
+      }
+      if (!pinched && this.state) {
+        const s = this.state; this.state = null;
+        const click = !s.dragging && t - s.t0 <= this.maxClickMs;
+        return { phase: "up", click, at: s.start, dx: 0, dy: 0 };
+      }
+      return { phase: "idle", dx: 0, dy: 0 };
+    }
+  }
+
+  const api = { OneEuroFilter, PointFilter, mapToScreen, DEFAULT_BOX, handSize, PinchDetector, DwellSelector, TargetHistory, AttentionTracker, fingerStates, classifyGesture, GestureStabilizer, TwoHandZoom, GrabPan, PalmNavigator, PinchDrag };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.HandLogic = api;
 })(typeof window !== "undefined" ? window : globalThis);

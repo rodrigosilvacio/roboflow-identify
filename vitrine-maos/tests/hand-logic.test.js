@@ -1,7 +1,7 @@
 // Testes da lógica da Vitrine por Gestos.
 // Rodar: node vitrine-maos/tests/hand-logic.test.js
 const assert = require("node:assert/strict");
-const { OneEuroFilter, mapToScreen, PinchDetector, DwellSelector, TargetHistory, AttentionTracker, classifyGesture, GestureStabilizer, TwoHandZoom, GrabPan } = require("../hand-logic.js");
+const { OneEuroFilter, mapToScreen, PinchDetector, DwellSelector, TargetHistory, AttentionTracker, classifyGesture, GestureStabilizer, TwoHandZoom, GrabPan } = require("../../shared/hand-logic.js");
 
 // Mão sintética: punho em (wx, wy), tamanho s; pinchGap = distância polegar-indicador em "tamanhos de mão"
 function hand({ wx = 0.5, wy = 0.7, s = 0.15, pinchGap = 0.8 } = {}) {

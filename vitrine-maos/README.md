@@ -38,7 +38,7 @@ Também funcionam botões + / − / Ver tudo, a roda do mouse, as teclas + / −
 
 O painel mostra **modelo, processador (GPU ou CPU), quadros por segundo e % de quadros com mão detectada**.
 
-- **Automático (padrão):** começa pela GPU e mede a velocidade com pelo menos 1,5 s de quadros reais. Abaixo de 10 quadros/s, **troca sozinho para a CPU**. Em algumas placas de vídeo, a GPU trava ao devolver o resultado ("GPU stall due to ReadPixels"). No teste com GPU emulada, ela rodou a 2 quadros/s, contra 11 a 12 na CPU.
+- **Automático (padrão):** começa pela GPU e, depois de 3 s e pelo menos 3 quadros, mede a velocidade desde o primeiro quadro (funciona mesmo com menos de 1 quadro/s). Abaixo de 10 quadros/s, **troca sozinho para a CPU**. Em algumas placas de vídeo, a GPU trava ao devolver o resultado ("GPU stall due to ReadPixels"). No teste com GPU emulada, ela rodou a 2 quadros/s, contra 11 a 12 na CPU.
 - **Seletor de processador** e o parâmetro `?processador=cpu` ou `?processador=gpu` na URL forçam um dos dois.
 - Erros repetidos na GPU também fazem a troca para a CPU.
 

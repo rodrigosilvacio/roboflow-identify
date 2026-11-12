@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Armazém 3D por Gestos</title>
+  <meta name="description" content="Navegue por um armazém em 3D com as mãos: indicador move o cursor, pinça clica e arrasta, palma em movimento move a vista." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../shared/consent.css" />
+  <script type="importmap">{ "imports": { "three": "../vendor/three/three.module.js" } }</script>
+</head>
+<body>
+  <main>
+    <header class="top">
+      <div>
+        <h1>Armazém 3D por Gestos</h1>
+        <p>Navegue pelo armazém sem tocar no computador. Os dados e o layout são fictícios.</p>
+      </div>
+      <div class="view-tools" role="group" aria-label="Vista">
+        <button id="zoom-in" type="button" aria-label="Aproximar">+</button>
+        <button id="zoom-out" type="button" aria-label="Afastar">−</button>
+        <button id="reset" type="button">Vista geral</button>
+      </div>
+    </header>
+
+    <section class="grid">
+      <div class="stage" id="stage" aria-label="Armazém em 3D. Com o mouse: arraste para girar, botão direito para mover, roda para zoom, clique para selecionar um módulo.">
+        <canvas id="scene"></canvas>
+        <div class="hint" id="hint">Arraste para girar · roda para zoom · clique numa estante</div>
+      </div>
+
+      <aside class="panel">
+        <div class="panel-head">
+          <h2>Controle por gestos</h2>
+          <span id="conn" class="conn" data-on="false">Desligado</span>
+        </div>
+        <p class="muted small">Usa a câmera deste computador. A imagem e o reconhecimento ficam neste dispositivo.</p>
+
+        <div class="cam" id="cam">
+          <video id="video" playsinline muted></video>
+          <canvas id="hand-canvas"></canvas>
+          <span id="gesture" class="gesture">Câmera desligada</span>
+        </div>
+        <div class="cam-buttons">
+          <button id="start" type="button" class="primary">Ligar câmera</button>
+          <button id="stop" type="button" disabled>Parar câmera</button>
+        </div>
+        <p id="status" class="status" role="status" aria-live="polite">Ligue a câmera e mostre a mão para começar.</p>
+
+        <h3>Gestos disponíveis</h3>
+        <ul class="gestures">
+          <li><span>☝️</span><div><b>Indicador:</b> mover o cursor</div></li>
+          <li><span>🤏</span><div><b>Pinça:</b> clicar (selecionar estante) e arrastar (girar a vista)</div></li>
+          <li><span>✋</span><div><b>Palma em movimento:</b> mover a vista. Aproxime a palma da câmera para dar zoom; afaste para sair</div></li>
+          <li><span>🙌</span><div><b>Pinça com as duas mãos:</b> zoom, como no celular</div></li>
+          <li><span>✊</span><div><b>Mão fechada:</b> pausa (descanse sem mexer em nada)</div></li>
+        </ul>
+
+        <div class="info" id="info" hidden>
+          <h3 id="info-title">Estante</h3>
+          <dl>
+            <div><dt>Níveis</dt><dd id="info-levels">—</dd></div>
+            <div><dt>Ocupação</dt><dd id="info-occ">—</dd></div>
+          </dl>
+          <div class="bar"><div id="info-bar"></div></div>
+        </div>
+        <h3>Módulos selecionados <small id="sel-count"></small></h3>
+        <ol id="sel-list" class="sel-list"><li class="empty">Clique ou faça pinça numa estante.</li></ol>
+
+        <details class="diag-box">
+          <summary>Diagnóstico</summary>
+          <p id="diag" class="diag">Aparece ao ligar a câmera.</p>
+          <label class="delegate">Processador
+            <select id="delegate">
+              <option value="auto">Automático</option>
+              <option value="gpu">GPU</option>
+              <option value="cpu">CPU</option>
+            </select>
+          </label>
+        </details>
+      </aside>
+    </section>
+
+    <footer>
+      <a href="../">Outros projetos</a> · <a href="https://github.com/rodrigosilvacio/roboflow-identify/tree/main/armazem-3d">Código</a>
+    </footer>
+  </main>
+
+  <div id="cursor" class="cursor" hidden aria-hidden="true"><span class="ring"></span><span class="dot"></span></div>
+  <div id="zoom-dot-a" class="zoom-dot" hidden aria-hidden="true"></div>
+  <div id="zoom-dot-b" class="zoom-dot" hidden aria-hidden="true"></div>
+
+  <script src="../shared/consent.js"></script>
+  <script>
+    Consent.gate({
+      id: "armazem-3d",
+      title: "Antes de ligar a câmera",
+      items: [
+        "A câmera do seu dispositivo será ligada quando você clicar em \"Ligar câmera\".",
+        "Só a posição das suas mãos é usada, e todo o reconhecimento acontece no seu navegador. Nenhuma imagem é enviada ou gravada.",
+        "O armazém, as estantes e a ocupação são fictícios.",
+        "Você pode navegar sem câmera, usando o mouse."
+      ],
+    });
+  </script>
+  <script src="../shared/hand-logic.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
