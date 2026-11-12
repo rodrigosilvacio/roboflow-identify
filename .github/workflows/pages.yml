@@ -38,7 +38,7 @@ jobs:
           mkdir -p _site/vitrine-maos
           cp vitrine-maos/index.html vitrine-maos/app.js vitrine-maos/style.css _site/vitrine-maos/
           mkdir -p _site/armazem-3d
-          cp armazem-3d/index.html armazem-3d/app.js armazem-3d/scene.js armazem-3d/style.css _site/armazem-3d/
+          cp armazem-3d/index.html armazem-3d/app.js armazem-3d/scene.js armazem-3d/sim.js armazem-3d/style.css _site/armazem-3d/
           cp -r vendor _site/vendor
           cp -r shared _site/shared
       - uses: actions/configure-pages@v5
