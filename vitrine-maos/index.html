@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Vitrine por Gestos</title>
+  <meta name="description" content="POC: aponte com a mão para produtos fictícios na prateleira e veja a lista se formar, com zoom e tempo de atenção." />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="../shared/consent.css" />
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Vitrine por Gestos</h1>
+      <p>Aponte com o dedo indicador para um produto. <b>Pare sobre ele por 1 segundo</b> ou <b>faça uma pinça</b> (polegar no indicador) para adicioná-lo à lista.</p>
+    </header>
+
+    <div class="toolbar">
+      <button id="start" type="button" class="primary">✋ Ligar câmera</button>
+      <button id="stop" type="button" hidden>Desligar câmera</button>
+      <div class="zoom" role="group" aria-label="Zoom da prateleira">
+        <button id="zoom-out" type="button" aria-label="Diminuir zoom">−</button>
+        <output id="zoom-level">100%</output>
+        <button id="zoom-in" type="button" aria-label="Aumentar zoom">+</button>
+        <button id="zoom-fit" type="button">Ver tudo</button>
+      </div>
+      <span id="status" class="status" role="status" aria-live="polite">Sem câmera: use o mouse para testar.</span>
+    </div>
+
+    <section class="grid">
+      <div class="viewport" id="viewport" tabindex="0" aria-label="Prateleiras. Use + e − para zoom e as setas para mover.">
+        <div class="store" id="store"></div>
+        <div class="cam" id="cam" hidden>
+          <video id="video" playsinline muted></video>
+          <canvas id="hand-canvas"></canvas>
+        </div>
+      </div>
+
+      <aside class="panel">
+        <div class="now">
+          <span class="label">Apontando agora</span>
+          <b id="pointing">—</b>
+        </div>
+        <h2>Legenda <small id="legend-count"></small></h2>
+        <ol id="legend" class="legend"><li class="empty">Aponte para um produto para começar.</li></ol>
+        <button id="clear" type="button">Limpar lista</button>
+
+        <h2>Como usar</h2>
+        <ul class="howto">
+          <li><b>Apontar:</b> o cursor segue a ponta do seu indicador.</li>
+          <li><b>Selecionar:</b> pare 1 s sobre o produto (o anel enche) ou faça uma pinça.</li>
+          <li><b>Zoom:</b> botões + e −, a roda do mouse ou as teclas + e −.</li>
+          <li><b>Mover com zoom:</b> leve o cursor até a borda da prateleira, arraste com o mouse ou use as setas.</li>
+        </ul>
+      </aside>
+    </section>
+
+    <footer>
+      <p><strong>Privacidade:</strong> a câmera é processada no seu navegador com o MediaPipe. Nenhuma imagem é enviada ou gravada. Os produtos são fictícios.</p>
+      <p><a href="../">Outros projetos</a> · <a href="https://github.com/rodrigosilvacio/roboflow-identify/tree/main/vitrine-maos">Código</a></p>
+    </footer>
+  </main>
+
+  <div id="cursor" class="cursor" hidden aria-hidden="true"><span class="ring"></span><span class="dot"></span></div>
+
+  <script src="../shared/consent.js"></script>
+  <script>
+    Consent.gate({
+      id: "vitrine-maos",
+      title: "Antes de ligar a câmera",
+      items: [
+        "A câmera do seu dispositivo será ligada quando você clicar em \"Ligar câmera\".",
+        "Só a posição da sua mão é usada, e todo o processamento acontece no seu navegador. Nenhuma imagem é enviada ou gravada.",
+        "Os produtos são fictícios. A lista de produtos apontados fica só nesta aba.",
+        "Você pode testar sem câmera, usando o mouse."
+      ],
+    });
+  </script>
+  <script src="hand-logic.js"></script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
